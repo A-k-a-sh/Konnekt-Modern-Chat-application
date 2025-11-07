@@ -1,0 +1,68 @@
+.utility {
+    opacity: 0;
+}
+
+
+.textAndUtility:hover .utility {
+    opacity: 1;
+}
+
+
+
+.MsgArea {
+    /* background-color: #99caff; */
+    background-image: url('https://images.unsplash.com/photo-1624139283078-74a0492f2ee3?q=80&w=2160&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+
+
+
+.msg-tail-right::before {
+    content: "";
+    position: absolute;
+    bottom: -0.1rem;
+    right: -0.35rem;
+    height: 1rem;
+    border-bottom-left-radius: 0.8rem 0.7rem;
+    border-right: 1rem solid #8774E1;
+    transform: translateY(-0.1rem);
+}
+
+.msg-tail-right::after {
+    content: "";
+    position: absolute;
+    bottom: -0.1rem;
+    right: -40px;
+    width: 10px;
+    height: 1rem;
+    background-color: black;
+    border-bottom-left-radius: 0.5rem;
+    transform: translate(-30px, -2px);
+}
+
+.msg-tail-left::before {
+    content: "";
+    position: absolute;
+    bottom: -0.1rem;
+    left: -0.35rem;
+    height: 1rem;
+    border-bottom-right-radius: 0.8rem 0.7rem;
+    border-left: 1rem solid #212121;
+    transform: translateY(-0.1rem);
+}
+
+.msg-tail-left::after {
+    content: "";
+    position: absolute;
+    bottom: -0.1rem;
+    left: -40px;
+    width: 10px;
+    height: 1rem;
+    background-color: black;
+    border-bottom-right-radius: 0.5rem;
+    transform: translate(30px, -2px);
+}

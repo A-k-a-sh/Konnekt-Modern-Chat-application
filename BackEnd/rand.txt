@@ -1,0 +1,91 @@
+
+const users = {};
+
+io.on('connection', (socket) => {
+    //console.log('a user connected with id: ' + socket.id);
+
+
+    // Step 1: Assign a username to a socket when user logs in or joins chat
+    socket.on('register', (username) => {
+        users[username] = socket.id;
+        console.log(`User ${username} registered with id: ${socket.id}`);
+    });
+
+
+    // Step 3: Remove user from mapping when they disconnect
+    socket.on('disconnect', () => {
+        const disconnectedUser = Object.keys(users).find(key => users[key] === socket.id);
+        if (disconnectedUser) {
+            
+            console.log(`User ${disconnectedUser} disconnected`);
+            delete users[disconnectedUser];
+        }
+    });
+
+})
+
+server.listen(port, () => {
+    console.log('listening on port ' + port);
+})
+
+
+┌───────────────────────┐
+│      START            │
+└──────────┬────────────┘
+           │
+           ▼
+┌───────────────────────┐
+│   Landing Page        │
+│  • View site          │
+│  • Login/Register     │
+└──────────┬────────────┘
+           │
+           ├───────────────┐
+           ▼               ▼
+┌───────────────────┐ ┌───────────────────┐
+│   REGISTER        │ │     LOGIN         │
+│ • Fill form       │ │ • Enter credentials│
+│ • Select role     │ └──────────┬────────┘
+└──────────┬────────┘            │
+           │                     │
+           └──────────┬──────────┘
+                      │
+                      ▼
+┌───────────────────────────────────┐
+│       Authentication              │
+│ • Validate credentials            │
+│ • Check role (Admin/Buyer)        │
+└──────────┬───────────────────┬────┘
+           │                   │
+           ▼                   ▼
+┌───────────────────┐ ┌───────────────────┐
+│  BUYER DASHBOARD  │ │  ADMIN DASHBOARD  │
+└──────────┬────────┘ └──────────┬────────┘
+           │                     │
+           ▼                     ▼
+┌───────────────────┐ ┌───────────────────┐
+│  Browse Products  │ │  Manage Users     │
+│ • Search/Filter   │ │ • Ban/Unban       │
+└──────────┬────────┘ └──────────┬────────┘
+           │                     │
+           ▼                     ▼
+┌───────────────────┐ ┌───────────────────┐
+│  Product Actions  │ │  Manage Products  │
+├───────────────────┤ │ • Approve/Remove  │
+│ • Bid/Buy         │ └──────────┬────────┘
+│ • Add to Cart     │            │
+└──────────┬────────┘            ▼
+           │            ┌───────────────────┐
+           ▼            │ Monitor System    │
+┌───────────────────┐  │ • Transactions    │
+│  Checkout Process │  │ • Disputes        │
+│ • Payment         │  └──────────┬────────┘
+│ • Confirmation    │             │
+└──────────┬────────┘             │
+           │                     │
+           └──────────┬──────────┘
+                      │
+                      ▼
+┌───────────────────────┐
+│       LOGOUT          │
+└───────────────────────┘

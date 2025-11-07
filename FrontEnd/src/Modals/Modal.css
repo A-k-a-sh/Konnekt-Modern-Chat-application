@@ -1,0 +1,49 @@
+/* styles.css or global.css */
+.custom-ant-modal .ant-modal-content {
+    background-color: rgba(65, 64, 64, 0.923); /* Tailwind's bg-gray-800 */
+    color: white;
+  }
+  
+  .custom-ant-modal .ant-modal-header {
+    background-color: rgba(65, 64, 64, 0); /* Tailwind's bg-gray-800 */
+    color: white;
+
+  }
+  
+.custom-ant-modal .ant-modal-body{
+  /* border: 2px solid red; */
+}
+
+/* Style both OK and Cancel buttons */
+.custom-ant-modal .ant-btn {
+  color: white;
+  
+}
+
+/* Style only the primary OK button */
+.custom-ant-modal .ant-btn-primary {
+  background-color: transparent;
+  /* border-color: red; */
+  outline: none;
+  border : 2px solid white;
+  color: white;
+}
+
+
+.custom-ant-modal:hover .ant-btn-primary:hover {
+  outline: none;
+  background-color: gray;
+
+}
+/* Optional: style only the Cancel button */
+.custom-ant-modal .ant-btn-default {
+  background-color: transparent;
+  border-color: white;
+  color: white;
+}
+
+
+  .custom-ant-modal .ant-modal-footer {
+    
+  }
+  

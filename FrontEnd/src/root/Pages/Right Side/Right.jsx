@@ -10,7 +10,7 @@ import { clearMessages, handleSocketMessage } from './SocketConnection'
 import Chats from './Chats'
 import ModalImageShow from '../../../Modals/ModalImageShow'
 
-import { useRightContext } from './Right Context/RightContext'
+import { useRightContext } from './Right Context/RightContext' 
 
 
 const Right = () => {

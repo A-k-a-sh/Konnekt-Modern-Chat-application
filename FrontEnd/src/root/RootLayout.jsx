@@ -25,15 +25,19 @@ import { Divider } from 'antd'
 import Right from './Pages/Right Side/Right'
 import { Outlet } from 'react-router-dom'
 import LeftSideBar from './Pages/Left side/LeftSideBar'
+import UserGroupDetails from './Pages/UserGroupDetails/UserGroupDetails'
+import { PanelProvider, usePanelContext } from '../Context/PanelContext'
 
 import RightContext from './Pages/Right Side/Right Context/RightContext'
 const RootLayout = _a => {
     var { style } = _a,
         restProps = __rest(_a, ['style']);
     return (
-        <Flex gap="middle" vertical>
-            <CustomSplitter />
-        </Flex>
+        <PanelProvider>
+            <Flex gap="middle" vertical>
+                <CustomSplitter />
+            </Flex>
+        </PanelProvider>
     )
 }
 
@@ -41,6 +45,18 @@ const RootLayout = _a => {
 const CustomSplitter = _a => {
     var { style } = _a,
         restProps = __rest(_a, ['style']);
+
+    const { isPanelOpen, setIsPanelOpen } = usePanelContext();
+    const [panelSize, setPanelSize] = React.useState('0%');
+
+    // Update panel size when isPanelOpen changes
+    React.useEffect(() => {
+        if (isPanelOpen) {
+            setPanelSize('25%');
+        } else {
+            setPanelSize('0%');
+        }
+    }, [isPanelOpen]);
 
     return (
         <Splitter
@@ -85,13 +101,28 @@ const CustomSplitter = _a => {
             </Splitter.Panel>
 
 
-            <Splitter.Panel collapsible max='35%' defaultSize={'0'} >
-                <div className='overflow-auto   flex-[0.4]  h-screen borde p-2 '>
-                    <div className=' rounded-lg overflow-hidden border p-1 h-full bg-black'>
-                        hello world
+            <Splitter.Panel
+                collapsible
+                max='35%'
+                min='0%'
+                size={panelSize}
+                onResize={(size) => {
+                    setPanelSize(size);
+                    // Update context state based on size
+                    if (size === '0%' || size === 0) {
+                        setIsPanelOpen(false);
+                    } else {
+                        setIsPanelOpen(true);
+                    }
+                }}
+            >
+                <div className='overflow-auto flex-[0.4] h-screen borde p-2'>
+                    <div className='rounded-lg overflow-hidden border border-white/10 h-full'>
+                        <UserGroupDetails />
                     </div>
                 </div>
             </Splitter.Panel>
+
 
 
 

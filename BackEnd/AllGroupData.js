@@ -1,64 +1,104 @@
 
-
-
-allGroupsData = [
+const allGroupsData = [
     {
         groupId: 1,
-        groupName: "Group 1",
-        adminId: "A",
-        groupImage: "https://www.shutterstock.com/image-photo/awesome-pic-natureza-600nw-2408133899.jpg",
+        groupName: "Code Warriors",
+        adminId: 1, // Akash
+        groupImage: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=2671&auto=format&fit=crop",
+        description: "A group for coding enthusiasts to share knowledge and projects.",
         groupMembers: [
-            { userId: "A", image: "https://www.shutterstock.com/image-photo/awesome-pic-natureza-600nw-2408133899.jpg" },
-            { userId: "C", image: "https://www.shutterstock.com/image-photo/awesome-pic-natureza-600nw-2408133899.jpg" },
-            { userId: "D", image: "https://www.shutterstock.com/image-photo/awesome-pic-natureza-600nw-2408133899.jpg" },
+            {
+                userId: 1,
+                userName: "Akash",
+                email: "akash@example.com",
+                bio: "Fullstack Developer | Tech Enthusiast",
+                image: "https://images.unsplash.com/photo-1520531158340-44015069e78e?q=80&w=3072&auto=format&fit=crop"
+            },
+            {
+                userId: 2,
+                userName: "B",
+                email: "b@example.com",
+                bio: "Loves coding and coffee ☕",
+                image: "https://images.unsplash.com/photo-1631555641489-e9b5f52d3e1f?q=80&w=2980&auto=format&fit=crop"
+            },
+            {
+                userId: 3,
+                userName: "C",
+                email: "c@example.com",
+                bio: "Designer 🎨",
+                image: "https://images.unsplash.com/photo-1622976480059-1e341a28786e?q=80&w=3087&auto=format&fit=crop"
+            }
         ],
-
         groupJoinRequests: [
-            { userId: "B", image: "https://www.shutterstock.com/image-photo/awesome-pic-natureza-600nw-2408133899.jpg" },
-            { userId: "E", image: "https://www.shutterstock.com/image-photo/awesome-pic-natureza-600nw-2408133899.jpg" },
-            { userId: "F", image: "https://www.shutterstock.com/image-photo/awesome-pic-natureza-600nw-2408133899.jpg" },
+            {
+                userId: 4,
+                userName: "D",
+                email: "d@example.com",
+                image: "https://images.unsplash.com/photo-1628498188873-579210ce622e?q=80&w=2268&auto=format&fit=crop"
+            }
         ]
     },
-
     {
         groupId: 2,
-        groupName: "Group 2",
-        adminId: "C",
-        groupImage: "https://images.unsplash.com/photo-1517999144091-3d9dca6d1e43?q=80&w=2267&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        groupName: "Design Heads",
+        adminId: 3, // C
+        groupImage: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=2670&auto=format&fit=crop",
+        description: "Creative minds discussing UI/UX and visual design.",
         groupMembers: [
-            { userId: "B", image: "https://www.shutterstock.com/image-photo/awesome-pic-natureza-600nw-2408133899.jpg" },
-            { userId: "C", image: "https://www.shutterstock.com/image-photo/awesome-pic-natureza-600nw-2408133899.jpg" },
-            { userId: "E", image: "https://www.shutterstock.com/image-photo/awesome-pic-natureza-600nw-2408133899.jpg" },
+            {
+                userId: 1,
+                userName: "Akash",
+                email: "akash@example.com",
+                bio: "Fullstack Developer | Tech Enthusiast",
+                image: "https://images.unsplash.com/photo-1520531158340-44015069e78e?q=80&w=3072&auto=format&fit=crop"
+            },
+            {
+                userId: 3,
+                userName: "C",
+                email: "c@example.com",
+                bio: "Designer 🎨",
+                image: "https://images.unsplash.com/photo-1622976480059-1e341a28786e?q=80&w=3087&auto=format&fit=crop"
+            },
+            {
+                userId: 2,
+                userName: "B",
+                email: "b@example.com",
+                bio: "Loves coding and coffee ☕",
+                image: "https://images.unsplash.com/photo-1631555641489-e9b5f52d3e1f?q=80&w=2980&auto=format&fit=crop"
+            }
         ],
-
-        groupJoinRequests: [
-            { userId: "D", image: "https://www.shutterstock.com/image-photo/awesome-pic-natureza-600nw-2408133899.jpg" },
-            { userId: "F", image: "https://www.shutterstock.com/image-photo/awesome-pic-natureza-600nw-2408133899.jpg" },
-
-        ]
+        groupJoinRequests: []
     },
-
-
-
     {
         groupId: 3,
-        groupName: "Group 3",
-        adminId: "A",
-        groupImage: "https://images.unsplash.com/photo-1517999144091-3d9dca6d1e43?q=80&w=2267&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        groupName: "Coffee Club",
+        adminId: 2, // B
+        groupImage: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2670&auto=format&fit=crop",
+        description: "Casual chats and chill vibes.",
         groupMembers: [
-            { userId: "A", image: "https://www.shutterstock.com/image-photo/awesome-pic-natureza-600nw-2408133899.jpg" },
-            { userId: "C", image: "https://www.shutterstock.com/image-photo/awesome-pic-natureza-600nw-2408133899.jpg" },
-            { userId: "E", image: "https://www.shutterstock.com/image-photo/awesome-pic-natureza-600nw-2408133899.jpg" },
+            {
+                userId: 2,
+                userName: "B",
+                email: "b@example.com",
+                bio: "Loves coding and coffee ☕",
+                image: "https://images.unsplash.com/photo-1631555641489-e9b5f52d3e1f?q=80&w=2980&auto=format&fit=crop"
+            }
         ],
-
         groupJoinRequests: [
-            //B wants to join
-            { userId: "D", image: "https://www.shutterstock.com/image-photo/awesome-pic-natureza-600nw-2408133899.jpg" },
-            { userId: "F", image: "https://www.shutterstock.com/image-photo/awesome-pic-natureza-600nw-2408133899.jpg" },
-
+            {
+                userId: 1,
+                userName: "Akash",
+                email: "akash@example.com",
+                image: "https://images.unsplash.com/photo-1520531158340-44015069e78e?q=80&w=3072&auto=format&fit=crop"
+            },
+            {
+                userId: 4,
+                userName: "D",
+                email: "d@example.com",
+                image: "https://images.unsplash.com/photo-1628498188873-579210ce622e?q=80&w=2268&auto=format&fit=crop"
+            }
         ]
     }
-]
-
+];
 
 module.exports = allGroupsData;

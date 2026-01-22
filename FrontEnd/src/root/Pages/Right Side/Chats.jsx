@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import axios from 'axios';
 
 import { cloudinaryDelete } from '../../../utility/cloudinaryUpload';
+import { getCloudinaryDownloadUrl } from '../../../utility/cloudinaryDownload';
 import { useChangeMessage } from './SocketConnection';
 
 import { deleteMsg } from './SocketConnection';
@@ -20,7 +21,7 @@ import ChatUtility from './ChatUtility';
 
 import { TexAreaFunctions } from '../input/functions';
 
-const Chats = ({ allMessages, setAllMessages, selectedUser, curUserInfo, showMediaFunction, setMsgToEdit }) => {
+const Chats = ({ messages, setAllMessages, curUserInfo, showMediaFunction, setMsgToEdit }) => {
     const [previews, setPreviews] = useState(null);
 
 
@@ -82,16 +83,6 @@ const Chats = ({ allMessages, setAllMessages, selectedUser, curUserInfo, showMed
     useChangeMessage(setAllMessages);
 
 
-    const UserToUserConnection = () => {
-        return allMessages.filter((msg) =>
-            (msg.chatType === 'private' && (msg.receiver.userId === selectedUser.userId && msg.sender.userId === curUserInfo.userId) ||
-                (msg.sender.userId === selectedUser.userId && msg.receiver.userId === curUserInfo.userId)) ||
-
-            (msg.chatType === 'group' && (msg.groupId === selectedGroup.groupId))
-        )
-    }
-
-
     function extractUrls(text) {
         const urlRegex = /(https?:\/\/[^\s]+)/g;
         return text.match(urlRegex) || [];
@@ -127,7 +118,7 @@ const Chats = ({ allMessages, setAllMessages, selectedUser, curUserInfo, showMed
 
 
     useEffect(() => {
-        const msg = allMessages[allMessages.length - 1]?.message;
+        const msg = messages[messages.length - 1]?.message;
         const urls = msg ? extractUrls(msg) : [];
 
         // const urls = extractUrls(msg.message);
@@ -138,7 +129,7 @@ const Chats = ({ allMessages, setAllMessages, selectedUser, curUserInfo, showMed
         if (!selectedMsg?.length) {
             setIsMsgSelected(false)
         }
-    }, [allMessages, selectedMsg]);
+    }, [messages, selectedMsg]);
 
 
 
@@ -162,7 +153,7 @@ const Chats = ({ allMessages, setAllMessages, selectedUser, curUserInfo, showMed
         return urls.length > 0
     }
 
-    console.log(allMessages);
+    console.log(messages);
 
 
     console.log(selectedMsg);
@@ -174,7 +165,7 @@ const Chats = ({ allMessages, setAllMessages, selectedUser, curUserInfo, showMed
             ref={parentRef}
         >
 
-            {allMessages && UserToUserConnection().map((msg, index) => (
+            {messages && messages.map((msg, index) => (
 
 
 
@@ -208,9 +199,9 @@ const Chats = ({ allMessages, setAllMessages, selectedUser, curUserInfo, showMed
 
                         {/* MSg showing div : text , media */}
                         <div
-                            className={`msgggsgsdf borde   relative  max-w-full min-w-[5rem] min-h-[2rem] whitspace-pre-wrap break-words  text-lg
-                                    ${msg.sender.userId === curUserInfo.userId ? `${msg.mediaLinks && !msg.message ? " text-zinc-200" : "text-zinc-200 px-2 pb-4 py-1 bg-[#8774E1] msg-tail-right"}` :
-                                    `${msg.mediaLinks && !msg.message ? "text-zinc-700" : "text-zinc-300 px-2 pb-4 py-1  bg-[#212121] msg-tail-left"}`}
+                            className={`msgggsgsdf borde relative max-w-full min-w-[5rem] min-h-[2rem] whitspace-pre-wrap break-words text-lg
+                                    ${msg.sender.userId === curUserInfo.userId ? `${msg.mediaLinks && !msg.message ? "text-zinc-200" : "text-white px-2 pb-4 py-1 bg-gradient-to-br from-purple-600 to-blue-600 shadow-lg shadow-purple-500/20 msg-tail-right"}` :
+                                    `${msg.mediaLinks && !msg.message ? "text-zinc-700" : "text-zinc-200 px-2 pb-4 py-1 bg-white/10 backdrop-blur-md border border-white/10 msg-tail-left"}`}
                                       rounded-2xl`
                             }
                         >
@@ -247,6 +238,50 @@ const Chats = ({ allMessages, setAllMessages, selectedUser, curUserInfo, showMed
                                         )
                                     }
 
+                                    {
+                                        link.resource_type === "raw" && (() => {
+                                            const fileName = link.url.split('/').pop().split('?')[0];
+                                            const fileExt = fileName.split('.').pop().toLowerCase();
+
+                                            const getFileIcon = (ext) => {
+                                                const icons = {
+                                                    pdf: { icon: 'fa-file-pdf', color: 'text-red-400' },
+                                                    txt: { icon: 'fa-file-lines', color: 'text-gray-400' },
+                                                    doc: { icon: 'fa-file-word', color: 'text-blue-400' },
+                                                    docx: { icon: 'fa-file-word', color: 'text-blue-400' },
+                                                    xls: { icon: 'fa-file-excel', color: 'text-green-400' },
+                                                    xlsx: { icon: 'fa-file-excel', color: 'text-green-400' },
+                                                    ppt: { icon: 'fa-file-powerpoint', color: 'text-orange-400' },
+                                                    pptx: { icon: 'fa-file-powerpoint', color: 'text-orange-400' },
+                                                    zip: { icon: 'fa-file-zipper', color: 'text-yellow-400' },
+                                                    rar: { icon: 'fa-file-zipper', color: 'text-yellow-400' }
+                                                };
+                                                return icons[ext] || { icon: 'fa-file', color: 'text-gray-400' };
+                                            };
+
+                                            const fileIcon = getFileIcon(fileExt);
+
+                                            // Create download URL with fl_attachment flag
+                                            const downloadUrl = getCloudinaryDownloadUrl(link.url, fileName);
+
+                                            return (
+                                                <div
+                                                    className='flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10 hover:border-purple-500/30 hover:bg-white/10 cursor-pointer transition-all duration-200 group max-w-xs'
+                                                    onClick={() => window.open(downloadUrl, '_blank')}
+                                                >
+                                                    <div className='w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center flex-shrink-0'>
+                                                        <i className={`fa-solid ${fileIcon.icon} ${fileIcon.color} text-xl`}></i>
+                                                    </div>
+                                                    <div className='flex-1 min-w-0'>
+                                                        <p className='text-sm text-white truncate group-hover:text-purple-300 transition-colors'>{fileName}</p>
+                                                        <p className='text-xs text-gray-400'>{fileExt.toUpperCase()}</p>
+                                                    </div>
+                                                    <i className="fa-solid fa-download text-gray-400 group-hover:text-purple-400 transition-colors"></i>
+                                                </div>
+                                            );
+                                        })()
+                                    }
+
 
 
                                 </div>
@@ -255,16 +290,16 @@ const Chats = ({ allMessages, setAllMessages, selectedUser, curUserInfo, showMed
                             {/* reply section */}
                             {msg.reply && (
                                 <div
-                                    className={`text-sm max-h-[5rem] overflow-y-scroll cursor-pointer text-white w-full px-1 py-1 rounded-md border-l-4 
-                                            ${msg.sender.userId === curUserInfo.userId ? "border-white bg-[#705dce]"
+                                    className={`text-sm max-h-[5rem] overflow-y-scroll cursor-pointer text-white w-full px-2 py-2 rounded-lg border-l-4 
+                                            ${msg.sender.userId === curUserInfo.userId ? "border-purple-400 bg-purple-600/30 backdrop-blur-sm"
                                             :
-                                            "bg-[#3d3a3ada]"
+                                            "border-blue-400 bg-white/20 backdrop-blur-sm"
                                         }
                                              `}
                                     onClick={() => scrollToDiv(msg.reply)}
 
                                 >
-                                    Reply To : {msg.reply.sender.userId === curUserInfo.userId ? "Yourself" : msg.reply.sender.userName}
+                                    <span className='text-xs text-gray-300'>Reply To: {msg.reply.sender.userId === curUserInfo.userId ? "Yourself" : msg.reply.sender.userName}</span>
                                     <br />
                                     {msg.reply.message.length > 120 ? msg.reply.message.substring(0, 120) + "..." : msg.reply.message}
                                 </div>
@@ -274,15 +309,15 @@ const Chats = ({ allMessages, setAllMessages, selectedUser, curUserInfo, showMed
 
                             {msg.forwardFrom && (
                                 <div
-                                    className={`text-sm max-h-[5rem] overflow-y-scroll block cursor-pointer text-white  px-1 py-2 rounded-md border-l-4 
-                                            ${msg.sender.userId === curUserInfo.userId ? "border-white bg-[#705dce]"
+                                    className={`text-sm max-h-[5rem] overflow-y-scroll block cursor-pointer text-white px-2 py-2 rounded-lg border-l-4 
+                                            ${msg.sender.userId === curUserInfo.userId ? "border-purple-400 bg-purple-600/30 backdrop-blur-sm"
                                             :
-                                            "bg-[#3d3a3ada]"
+                                            "border-blue-400 bg-white/20 backdrop-blur-sm"
                                         }
                                              `}
 
                                 >
-                                    Forwarded from : {msg.forwardFrom?.userName}
+                                    <span className='text-xs text-gray-300'>Forwarded from: {msg.forwardFrom?.userName}</span>
                                     <br />
 
                                 </div>

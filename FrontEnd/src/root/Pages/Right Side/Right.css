@@ -1,5 +1,6 @@
 .utility {
     opacity: 0;
+    transition: opacity 0.2s ease;
 }
 
 
@@ -10,59 +11,127 @@
 
 
 .MsgArea {
-    /* background-color: #99caff; */
-    background-image: url('https://images.unsplash.com/photo-1624139283078-74a0492f2ee3?q=80&w=2160&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+    /* Enhanced gradient background with depth */
+    background: linear-gradient(135deg, #0a0a15 0%, #1a1a2e 25%, #16213e 50%, #1a1a2e 75%, #0a0a15 100%);
+    position: relative;
+    overflow: hidden;
+}
 
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
+.MsgArea::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+        radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.03) 0%, transparent 60%);
+    pointer-events: none;
+    animation: backgroundPulse 15s ease-in-out infinite;
+}
+
+@keyframes backgroundPulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
 }
 
 
-
-
-.msg-tail-right::before {
+/* Message bubble tails - sent messages (right side) */
+/* .msg-tail-right::before {
     content: "";
     position: absolute;
-    bottom: -0.1rem;
-    right: -0.35rem;
-    height: 1rem;
-    border-bottom-left-radius: 0.8rem 0.7rem;
-    border-right: 1rem solid #8774E1;
-    transform: translateY(-0.1rem);
+    bottom: 0;
+    right: -6px;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+    border-radius: 0 0 0 16px;
 }
 
 .msg-tail-right::after {
     content: "";
     position: absolute;
-    bottom: -0.1rem;
-    right: -40px;
-    width: 10px;
-    height: 1rem;
-    background-color: black;
-    border-bottom-left-radius: 0.5rem;
-    transform: translate(-30px, -2px);
-}
+    bottom: 0;
+    right: -6px;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, #0a0a15 0%, #1a1a2e 100%);
+    border-radius: 0 0 0 10px;
+} */
 
-.msg-tail-left::before {
+/* Message bubble tails - received messages (left side) */
+/* .msg-tail-left::before {
     content: "";
     position: absolute;
-    bottom: -0.1rem;
-    left: -0.35rem;
-    height: 1rem;
-    border-bottom-right-radius: 0.8rem 0.7rem;
-    border-left: 1rem solid #212121;
-    transform: translateY(-0.1rem);
-}
+    bottom: 0;
+    left: -6px;
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(10px);
+    border-radius: 0 0 16px 0;
+} */
 
-.msg-tail-left::after {
+/* .msg-tail-left::after {
     content: "";
     position: absolute;
-    bottom: -0.1rem;
-    left: -40px;
-    width: 10px;
-    height: 1rem;
-    background-color: black;
-    border-bottom-right-radius: 0.5rem;
-    transform: translate(30px, -2px);
+    bottom: 0;
+    left: -6px;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, #0a0a15 0%, #1a1a2e 100%);
+    border-radius: 0 0 10px 0;
+} */
+
+/* Custom scrollbar for chat area */
+.MsgArea::-webkit-scrollbar {
+    width: 8px;
+}
+
+.MsgArea::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.MsgArea::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(139, 92, 246, 0.4), rgba(59, 130, 246, 0.4));
+    border-radius: 10px;
+}
+
+.MsgArea::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(139, 92, 246, 0.6), rgba(59, 130, 246, 0.6));
+}
+
+/* Message animations */
+@keyframes messageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.textMsg>div {
+    animation: messageSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hover effect for messages */
+.textAndUtility {
+    transition: all 0.2s ease;
+}
+
+.textAndUtility:hover {
+    transform: translateY(-1px);
 }

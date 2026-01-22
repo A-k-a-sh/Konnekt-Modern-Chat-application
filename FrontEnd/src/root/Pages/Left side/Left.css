@@ -1,16 +1,37 @@
-.Single_User{
-    border-radius: 0.4rem;
-    cursor: pointer;
-    
-    /* border-bottom-width: 0.4px;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0; */
-
-    /* padding: 2.3rem 1rem; */
-    transition: all 0.2s ease-in-out;
+/* Custom scrollbar for sidebar */
+.Single_User::-webkit-scrollbar,
+div::-webkit-scrollbar {
+    width: 6px;
 }
 
-/* .Single_User:hover{
-    background-color: #70777c3f;
-    
-} */
+.Single_User::-webkit-scrollbar-track,
+div::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.Single_User::-webkit-scrollbar-thumb,
+div::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.3);
+    border-radius: 10px;
+}
+
+.Single_User::-webkit-scrollbar-thumb:hover,
+div::-webkit-scrollbar-thumb:hover {
+    background: rgba(139, 92, 246, 0.5);
+}
+
+/* Smooth animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.Single_User {
+    animation: slideIn 0.3s ease-out;
+}

@@ -1,5 +1,5 @@
 
-import { editMsg, deleteMsg, handleSubmit , replyMsgToSocket } from "../Right Side/SocketConnection";
+import { editMsg, deleteMsg, handleSubmit, replyMsgToSocket } from "../Right Side/SocketConnection";
 
 import { cloudinaryUpload, cloudinaryDelete } from "../../../utility/cloudinaryUpload";
 
@@ -14,13 +14,18 @@ export const TexAreaFunctions = {
         const files = Array.from(event.target.files); // Convert FileList to array
 
 
-        let fileData = files.map((file) => (
-            {
+        let fileData = files.map((file) => {
+            const fileType = file.type.split('/')[0]; // Get main type (image, video, text, application)
+
+            // Normalize type: only keep 'image' and 'video', everything else becomes 'application'
+            const normalizedType = (fileType === 'image' || fileType === 'video') ? fileType : 'application';
+
+            return {
                 file: file,
                 blobUrls: URL.createObjectURL(file),// Generate temporary URLs
-                type: file.type.split('/')[0] //getting file type
-            }
-        ))
+                type: normalizedType
+            };
+        })
 
 
         setFileData((prev) => [...prev, ...fileData])
@@ -30,7 +35,7 @@ export const TexAreaFunctions = {
 
     },
 
-    sendMsg: async (e, msg, setMsg, msgToEdit, setMsgToEdit, setAllMessages, setOutgoingMsg, selectedUser, userInfo, fileData, setFileData, setMediaUploading ,msgToReply , setMsgToReply , selectedGroup) => {
+    sendMsg: async (e, msg, setMsg, msgToEdit, setMsgToEdit, setAllMessages, setOutgoingMsg, selectedUser, userInfo, fileData, setFileData, setMediaUploading, msgToReply, setMsgToReply, selectedGroup) => {
 
 
         //msg , setMsg - typed message in text area
@@ -89,7 +94,7 @@ export const TexAreaFunctions = {
 
         setMsgToReply(null)
 
-        handleSubmit(e, msgTemp, selectedUser, userInfo, validUrls , msgToReplyTemp , selectedGroup);
+        handleSubmit(e, msgTemp, selectedUser, userInfo, validUrls, msgToReplyTemp, selectedGroup);
 
 
 
@@ -115,7 +120,7 @@ export const TexAreaFunctions = {
         }, [msg]);
     },
 
-    scrollToDiv: (childRef , msg, setSelectedChatToChangBg) => {
+    scrollToDiv: (childRef, msg, setSelectedChatToChangBg) => {
         if (childRef.current[msg.msgId]) {
             childRef.current[msg.msgId].scrollIntoView({
                 behavior: 'smooth',

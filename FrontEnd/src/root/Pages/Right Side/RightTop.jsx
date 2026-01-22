@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
 import { useAllContext } from '../../../Context/AllContext'
-import ModalUserSettings from '../../../Modals/ModalUserSettings'
+import { usePanelContext } from '../../../Context/PanelContext'
 import { useIsOnline } from './SocketConnection'
 import { useRightContext } from './Right Context/RightContext'
 import Avatar from '@mui/joy/Avatar';
@@ -49,70 +49,55 @@ const RightTop = () => {
     total: 24,
   };
   const { avatars, surplus } = clampAvatars(dataFromTheServer.people, {
-    max: 5,
+    max: 4,
     total: dataFromTheServer.total,
   });
 
-  const { MsgAreaDivRef, isMsgSelected, setIsMsgSelected, setSelectedMsg, selectedMsg } = useRightContext()
-  const [modalOpen, setModalOpen] = useState(false)
+
+  const { selectedUser, selectedGroup, userInfo: info } = useAllContext()
+  const { togglePanel } = usePanelContext()
+  const { isMsgSelected, selectedMsg, setSelectedMsg, setIsMsgSelected } = useRightContext()
+
+  const location = useLocation()
+
+  const [isOnline, setIsOnline] = useState(false)
+  useIsOnline(selectedUser, info, setIsOnline)
+
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
-  
-
-  const [forwardMsgModalOpen , setForwardMsgModalOpen] = useState(false)
+  const [forwardMsgModalOpen, setForwardMsgModalOpen] = useState(false)
 
 
+  const handleForward = () => {
+    setForwardMsgModalOpen(true)
+  }
 
-
-  // console.log('in right top:', open);
-  const { selectedUser, userInfo, isOnline, setIsOnline, selectedGroup , connected_to } = useAllContext()
-
-  console.log(connected_to);
-
-  useIsOnline(selectedUser, userInfo, setIsOnline)
-
-  const [info, setInfo] = useState({})
-
-  const path = useLocation().pathname;
-
-
-
-  console.log(info);
-
-
-  useEffect(() => {
-    setInfo({
-      ...selectedUser,
-      path: path,
-      selectedGroup: selectedGroup
-    });
-  }, [selectedUser, selectedGroup]);
 
 
   return (
-    <div
-      className=' h-full w-full flex items-center bg-blue-600/10 backdrop-blur-md  '
-    >
+    <div className='h-full w-full flex items-center bg-gradient-to-r from-[#1a1a2e] via-[#16213e] to-[#1a1a2e] border-b border-white/10 backdrop-blur-xl shadow-lg'>
 
       {!isMsgSelected ? (
         <div
-          className=' max-h-3/4    max-w-64 ml-1   zinc-700 py-1 px-4  rounded-lg hover:bg-zinc-600 duration-500 cursor-pointer  flex flex-row gap-4  justify-start items-center'
-          onClick={() => setModalOpen(true)}
+          className='group max-h-3/4 max-w-64 ml-4 py-2 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-purple-500/50 duration-300 cursor-pointer flex flex-row gap-4 justify-start items-center transition-all hover:shadow-lg hover:shadow-purple-500/20'
+          onClick={togglePanel}
         >
 
           <div className='relative'>
-            <img className='w-12 h-12 rounded-full' src={info.selectedGroup?.groupImage || info.profilePhoto} alt="" />
+            <div className='w-12 h-12 rounded-full overflow-hidden ring-2 ring-white/20 group-hover:ring-purple-500/50 transition-all duration-300'>
+              <img className='w-full h-full object-cover' src={selectedGroup?.groupImage || selectedUser?.profilePhoto} alt="" />
+            </div>
 
-            <div className='absolute -bottom-1 -right-1 '>
-              <i className={`fa-solid fa-circle pr-1 ${isOnline ? 'text-green-400' : 'text-zinc-400'} `}></i>
+            <div className='absolute -bottom-1 -right-1'>
+              <div className={`w-3.5 h-3.5 rounded-full border-2 border-[#1a1a2e] ${isOnline ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}`}></div>
             </div>
           </div>
 
-          <div className='flex  flex-col jucent-center  '>
-            <p>{selectedUser.userName || info.selectedGroup?.groupName} </p>
+          <div className='flex flex-col justify-center'>
+            <p className='font-medium text-white group-hover:text-purple-200 transition-colors'>{selectedUser?.userName || selectedGroup?.groupName}</p>
 
 
             {
-              info.selectedGroup?.groupMembers ? (
+              selectedGroup?.groupMembers ? (
                 <AvatarGroup
                   color='neutral'
                   variant='soft'
@@ -126,8 +111,8 @@ const RightTop = () => {
                   {!!surplus && <Avatar size='sm'>+{surplus}</Avatar>}
                 </AvatarGroup>
               ) : (
-                <p className='text-xs borde text-zinc-500'>
-                  Status : {isOnline ? 'Online' : 'Offline'}
+                <p className='text-xs text-gray-400'>
+                  {isOnline ? '🟢 Online' : '⚫ Offline'}
 
                 </p>
               )
@@ -140,48 +125,48 @@ const RightTop = () => {
         </div>
 
       ) : (
-        <div className='flex flex-row justify-between items-center  px-2 w-full'>
+        <div className='flex flex-row justify-between items-center px-4 w-full'>
 
-          <div className='flex flex-row gap-4 px-2 '>
+          <div className='flex flex-row gap-3'>
 
             {selectedMsg.some((msg) => msg.chatType === 'group' && msg.sender.userId !== userInfo.userId) ? (
-               
+
               null
             ) : (
-              <div 
-               className=' bg-gray-500/30 px-3 py-2 rounded-lg flex flex-row items-center hover:bg-gray-500/65 cursor-pointer duration-150'
-               onClick={()=> setDeleteModalOpen(true)}
-             >
-               <i className="fa-solid fa-trash px-2 py-1   w-fit h-fit"></i>
-               <p>Delete</p>
-             </div>
+              <button
+                className='bg-gradient-to-r from-red-600/20 to-red-500/20 hover:from-red-600/30 hover:to-red-500/30 border border-red-500/30 hover:border-red-500/50 px-4 py-2 rounded-lg flex flex-row items-center gap-2 cursor-pointer duration-300 transition-all hover:shadow-lg hover:shadow-red-500/20'
+                onClick={() => setDeleteModalOpen(true)}
+              >
+                <i className="fa-solid fa-trash text-red-400"></i>
+                <p className='text-white font-medium text-sm'>Delete</p>
+              </button>
             )
-          }
-           
+            }
 
-            <div 
-              className='bg-gray-500/30 px-3 py-2 rounded-lg flex flex-row items-center hover:bg-gray-500/65 cursor-pointer duration-150'
+
+            <button
+              className='bg-gradient-to-r from-blue-600/20 to-purple-600/20 hover:from-blue-600/30 hover:to-purple-600/30 border border-purple-500/30 hover:border-purple-500/50 px-4 py-2 rounded-lg flex flex-row items-center gap-2 cursor-pointer duration-300 transition-all hover:shadow-lg hover:shadow-purple-500/20'
               onClick={() => setForwardMsgModalOpen(true)}
             >
-              <i className={`fa-solid fa-share px-2 py-1 rounded-full hover:bg-gray-600 w-fit h-fit `}></i>
-              <p>Forward</p>
-            </div>
+              <i className="fa-solid fa-share text-purple-400"></i>
+              <p className='text-white font-medium text-sm'>Forward</p>
+            </button>
 
           </div>
-          <div className='flex flex-row gap-3 items-center  mr-3'>
-            <p>{selectedMsg?.length} Message selected</p>
+          <div className='flex flex-row gap-4 items-center'>
+            <p className='text-gray-300 text-sm'><span className='font-bold text-purple-400'>{selectedMsg?.length}</span> selected</p>
 
 
-            <div
-              className='flex flex-row gap-3 items-center px-3 cursor-pointer rounded-lg py-1 hover:bg-gray-600/80'
+            <button
+              className='flex flex-row gap-2 items-center px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 cursor-pointer transition-all duration-300'
               onClick={() => {
                 setSelectedMsg([])
 
               }}
             >
-              <i class="fa-solid fa-xmark"></i>
-              <p>Cancel</p>
-            </div>
+              <i className="fa-solid fa-xmark text-gray-400"></i>
+              <p className='text-white text-sm'>Cancel</p>
+            </button>
           </div>
 
         </div >
@@ -191,37 +176,22 @@ const RightTop = () => {
 
 
 
-
-      <div className='hidden'>
-        {
-          (Object.keys(selectedGroup).length || Object.keys(selectedUser).length) &&
-          <ModalUserSettings
-            setModalOpen={setModalOpen}
-            modalOpen={modalOpen}
-            MsgAreaDivRef={MsgAreaDivRef}
-            infoFromRightTop={info}
-
-          />
-        }
-
-      </div>
-
       <div className=''>
 
         <ModalDelSelectedMsg
-         deleteModalOpen={deleteModalOpen}
-         setDeleteModalOpen={setDeleteModalOpen}
+          deleteModalOpen={deleteModalOpen}
+          setDeleteModalOpen={setDeleteModalOpen}
 
         />
-        
+
       </div>
 
       <div className=''>
         <ModalForwardMsg
           forwardMsgModalOpen={forwardMsgModalOpen}
           setForwardMsgModalOpen={setForwardMsgModalOpen}
-          selectedMsg = {selectedMsg}
-          setSelectedMsg = {setSelectedMsg}
+          selectedMsg={selectedMsg}
+          setSelectedMsg={setSelectedMsg}
 
 
         />

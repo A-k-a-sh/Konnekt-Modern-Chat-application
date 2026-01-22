@@ -21,7 +21,7 @@ export default function ModalForwardMsg({ forwardMsgModalOpen, setForwardMsgModa
 
 
 
-    const { connected_to ,  userInfo ,joined_groupsInfo , selectedUser} = useAllContext();
+    const { connected_to, userInfo, joined_groupsInfo, selectedUser } = useAllContext();
 
 
     return (
@@ -32,7 +32,7 @@ export default function ModalForwardMsg({ forwardMsgModalOpen, setForwardMsgModa
                 onClose={() => {
                     setLayout(undefined);
                     setForwardMsgModalOpen(false);
-                    setDisabledButtons(new Set()); 
+                    setDisabledButtons(new Set());
                 }}
             >
                 <ModalDialog
@@ -49,7 +49,7 @@ export default function ModalForwardMsg({ forwardMsgModalOpen, setForwardMsgModa
 
 
                     <div className='text-white h-full w-full   overflow-auto'>
-                        {connected_to.map((user, index) => {
+                        {connected_to && connected_to.filter(user => user && user.userId).map((user, index) => {
 
                             const isDisabled = disabledButtons.has(user.userId)
                             const handleForward = (e) => {
@@ -66,9 +66,9 @@ export default function ModalForwardMsg({ forwardMsgModalOpen, setForwardMsgModa
                                 //msgToReply - null
                                 //selectedGroup - {}
                                 //we have all info inside each selectedMsg
-                                
+
                                 selectedMsg.map(msg => {
-                                    handleSubmit(e , msg.message , user , userInfo , msg.mediaLinks , null , {} , msg.sender)
+                                    handleSubmit(e, msg.message, user, userInfo, msg.mediaLinks, null, {}, msg.sender)
                                 })
                                 setDisabledButtons(prev => new Set(prev).add(user.userId));
                             };
@@ -108,8 +108,8 @@ export default function ModalForwardMsg({ forwardMsgModalOpen, setForwardMsgModa
                                         <div className='mr-2'>
                                             <button
                                                 className='bg-[#3bb3d2e2] text-white px-3 py-2 rounded-md hover:bg-[#3bb4d2bc] duration-200 disabled:opacity-50'
-                                                // onClick={handleForward}
-                                                // disabled={isDisabled}
+                                            // onClick={handleForward}
+                                            // disabled={isDisabled}
                                             >
                                                 Forward
                                             </button>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useMemo } from 'react'
 import RightTop from './RightTop'
 
 import { useAllContext } from '../../../Context/AllContext'
@@ -10,7 +10,7 @@ import { clearMessages, handleSocketMessage } from './SocketConnection'
 import Chats from './Chats'
 import ModalImageShow from '../../../Modals/ModalImageShow'
 
-import { useRightContext } from './Right Context/RightContext' 
+import { useRightContext } from './Right Context/RightContext'
 
 
 const Right = () => {
@@ -26,8 +26,8 @@ const Right = () => {
     // const [allMessages, setAllMessages] = useState([])
 
     const [msgToEdit, setMsgToEdit] = useState(null)
-    const { selectedUser, userInfo: curUserInfo, selectedGroup , allMessages, setAllMessages } = useAllContext()
-    const {setSelectedMsg , setIsMsgSelected} = useRightContext()
+    const { selectedUser, userInfo: curUserInfo, selectedGroup, allMessages, setAllMessages } = useAllContext()
+    const { setSelectedMsg, setIsMsgSelected } = useRightContext()
 
     useEffect(() => {
         setSelectedMsg([])
@@ -37,6 +37,16 @@ const Right = () => {
     handleSocketMessage(setAllMessages)
 
     // clearMessages(setAllMessages, setImages, selectedUser)
+
+    // Filter messages based on selected user or group
+    const filteredMessages = useMemo(() => {
+        return allMessages.filter((msg) =>
+            (msg.chatType === 'private' && (msg.receiver.userId === selectedUser.userId && msg.sender.userId === curUserInfo.userId) ||
+                (msg.sender.userId === selectedUser.userId && msg.receiver.userId === curUserInfo.userId)) ||
+
+            (msg.chatType === 'group' && (msg.groupId === selectedGroup.groupId))
+        )
+    }, [allMessages, selectedUser, selectedGroup, curUserInfo])
 
     const showMediaFunction = (src, type) => {
         setShowImg(true)
@@ -51,7 +61,7 @@ const Right = () => {
     // console.log(selectedGroup);
 
     return (
-        (Object.keys(selectedGroup).length || Object.keys(selectedUser).length) ? (
+        ((selectedGroup && Object.keys(selectedGroup).length > 0) || (selectedUser && Object.keys(selectedUser).length > 0)) ? (
             <div className='MsgArea  h-full flex flex-col   ' ref={MsgAreaDivRef}>
 
                 <div className=' h-[5rem] '>
@@ -67,9 +77,8 @@ const Right = () => {
                     {/* chat msg box div */}
                     <div className='overflow-y-auto'>
                         <Chats
-                            allMessages={allMessages}
+                            messages={filteredMessages}
                             setAllMessages={setAllMessages}
-                            selectedUser={selectedUser}
                             curUserInfo={curUserInfo}
                             showMediaFunction={showMediaFunction}
                             setMsgToEdit={setMsgToEdit}
@@ -109,6 +118,15 @@ const Right = () => {
                                                 <source src={fileInfo.blobUrls} type="video/mp4" />
                                                 Your browser does not support the video tag.
                                             </video>
+                                        )
+                                    }
+
+                                    {
+                                        fileInfo.type === 'application' && (
+                                            <div className='w-20 h-20 rounded-lg border border-white/20 bg-white/5 flex flex-col items-center justify-center gap-1 p-2'>
+                                                <i className="fa-solid fa-file text-2xl text-green-400"></i>
+                                                <span className='text-xs text-white truncate w-full text-center'>{fileInfo.file.name.split('.').pop().toUpperCase()}</span>
+                                            </div>
                                         )
                                     }
 

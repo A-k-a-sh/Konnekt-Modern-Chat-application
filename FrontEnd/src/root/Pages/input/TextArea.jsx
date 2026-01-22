@@ -15,8 +15,8 @@ import { useRightContext } from '../Right Side/Right Context/RightContext';
 
 const InputArea = ({ setOutgoingMsg, setMsgToEdit, msgToEdit, fileData, setFileData }) => {
 
-    const { parentRef, childRef, setSelectedChatToChangBg , msgToReply , setMsgToReply } = useRightContext()
-    const { setMediaUploading ,selectedUser , userInfo  , selectedGroup , setAllMessages} = useAllContext()
+    const { parentRef, childRef, setSelectedChatToChangBg, msgToReply, setMsgToReply } = useRightContext()
+    const { setMediaUploading, selectedUser, userInfo, selectedGroup, setAllMessages } = useAllContext()
 
     const textareaRef = useRef(null);
     const fileInputRef = useRef(null);
@@ -29,7 +29,7 @@ const InputArea = ({ setOutgoingMsg, setMsgToEdit, msgToEdit, fileData, setFileD
     useChangeMessage(setAllMessages);
     useClickOutside(dropdownRef, showDropdown, setShowDropdown);
     TexAreaFunctions.useTextAreaDynamicHeight(msg, textareaRef);
-    
+
 
     const scrollToDiv = (msg) => {
         TexAreaFunctions.scrollToDiv(childRef, msg, setSelectedChatToChangBg)
@@ -43,7 +43,7 @@ const InputArea = ({ setOutgoingMsg, setMsgToEdit, msgToEdit, fileData, setFileD
 
     const sendMsg = (e) => {
 
-        TexAreaFunctions.sendMsg(e, msg, setMsg, msgToEdit, setMsgToEdit, setAllMessages, setOutgoingMsg, selectedUser, userInfo, fileData, setFileData, setMediaUploading , msgToReply , setMsgToReply , selectedGroup)
+        TexAreaFunctions.sendMsg(e, msg, setMsg, msgToEdit, setMsgToEdit, setAllMessages, setOutgoingMsg, selectedUser, userInfo, fileData, setFileData, setMediaUploading, msgToReply, setMsgToReply, selectedGroup)
     }
 
 
@@ -59,11 +59,13 @@ const InputArea = ({ setOutgoingMsg, setMsgToEdit, msgToEdit, fileData, setFileD
 
                 {/* emoji icon div */}
                 <div
-                    className='cursor-pointer relative'
+                    className='cursor-pointer relative group'
                     onMouseOver={() => setShowEmojiPicker(true)}
                     onMouseLeave={() => setShowEmojiPicker(false)}
                 >
-                    <i className="fa-regular fa-face-smile text-2xl text-blue-200"></i>
+                    <div className='w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-purple-500/50 flex items-center justify-center transition-all duration-300 hover:scale-110'>
+                        <i className="fa-regular fa-face-smile text-xl text-purple-400 group-hover:text-purple-300"></i>
+                    </div>
 
                     <div className='absolute z-50 bottom-16 inset-x-0 '>
                         <EmojiPicker
@@ -78,33 +80,33 @@ const InputArea = ({ setOutgoingMsg, setMsgToEdit, msgToEdit, fileData, setFileD
                 </div>
 
                 {/* Only Text and reply/editing area */}
-                <div className='w-[100%] h-full duration-500  backdrop:blur-md bg-blue-600/10 text-zinc-200 rounded-xl px-4 pt-2 overflow-hidde'>
+                <div className='w-[100%] h-full duration-300 bg-gradient-to-r from-white/5 to-white/10 backdrop-blur-md border border-white/10 text-zinc-200 rounded-xl px-4 pt-2 overflow-hidden shadow-lg'>
 
                     {/* Editing/replying area */}
                     {
                         (msgToEdit || msgToReply) && (
                             <div
-                                className='border overflow-auto  break-words py-2  px-2 mb-1 mx-auto bg-neutral-500 flex flex-row gap-2 justify-between items-center rounded-lg '
+                                className='border border-purple-500/30 overflow-auto break-words py-2 px-3 mb-2 mx-auto bg-gradient-to-r from-purple-600/20 to-blue-600/20 flex flex-row gap-2 justify-between items-center rounded-lg backdrop-blur-sm'
 
                             >
                                 {/* Reply/edit icon and msg */}
-                                <div 
-                                    className='px-2 flex-1 flex flex-row gap-2 cursor-pointer  '
+                                <div
+                                    className='px-2 flex-1 flex flex-row gap-3 cursor-pointer hover:text-purple-300 transition-colors'
                                     onClick={() => scrollToDiv(msgToEdit || msgToReply)}
                                 >
                                     {/* reply icon */}
-                                    <div className=''>
-                                        <i className={`fa-solid ${msgToEdit ? "fa-marker" : "fa-reply"}`}></i>
+                                    <div className='flex items-center'>
+                                        <i className={`fa-solid ${msgToEdit ? "fa-marker" : "fa-reply"} text-purple-400`}></i>
                                     </div>
 
                                     {/* reply/edit msg */}
-                                    <div  className=''>"
+                                    <div className='text-sm'>"
                                         {
-                                            msgToEdit?.message === '' ? 'Media' :msgToEdit?.message.length > 180 ? msgToEdit?.message.substring(0, 180) + '...' : msgToEdit?.message
+                                            msgToEdit?.message === '' ? 'Media' : msgToEdit?.message.length > 180 ? msgToEdit?.message.substring(0, 180) + '...' : msgToEdit?.message
                                         }
 
                                         {
-                                            msgToReply?.message === '' ? 'Media' :msgToReply?.message.length > 180 ? msgToReply?.message.substring(0, 180) + '...' : msgToReply?.message
+                                            msgToReply?.message === '' ? 'Media' : msgToReply?.message.length > 180 ? msgToReply?.message.substring(0, 180) + '...' : msgToReply?.message
                                         }
                                         "
                                     </div>
@@ -115,14 +117,14 @@ const InputArea = ({ setOutgoingMsg, setMsgToEdit, msgToEdit, fileData, setFileD
 
                                 {/* Cancel reply/edit icon */}
                                 <div
-                                    className='cursor-pointer opacity-85 hover:opacity-100 z-50'
+                                    className='cursor-pointer opacity-70 hover:opacity-100 z-50 transition-opacity'
                                     tabIndex={100}
                                     onClick={() => {
                                         setMsgToEdit(null)
                                         setMsgToReply(null)
                                     }}
                                 >
-                                    <i className="fa-solid fa-circle-xmark"></i>
+                                    <i className="fa-solid fa-circle-xmark text-purple-400 hover:text-purple-300"></i>
                                 </div>
 
                             </div>
@@ -132,7 +134,7 @@ const InputArea = ({ setOutgoingMsg, setMsgToEdit, msgToEdit, fileData, setFileD
                     <textarea
                         ref={textareaRef}
 
-                        className="text-lg focus:outline-none font-mono outline-none  resize-none w-full backdrop:blur-md bg-blue-600/0 "
+                        className="text-lg focus:outline-none font-mono outline-none resize-none w-full bg-transparent placeholder-gray-400"
                         value={msg}
                         onChange={(e) => setMsg(e.target.value)}
                         placeholder="Type a message"
@@ -147,13 +149,13 @@ const InputArea = ({ setOutgoingMsg, setMsgToEdit, msgToEdit, fileData, setFileD
                 </div>
 
                 {/* media button and send button */}
-                <div className="flex flex-row gap-2 items-center relative">
+                <div className="flex flex-row gap-3 items-center relative">
 
-                    {/* Media  button : + */}
-                    <button className="bg-blue-200 relative text-white rounded-full  w-8 h-8"
+                    {/* Media button : + */}
+                    <button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full w-10 h-10 flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 group"
                         onClick={() => setShowDropdown(!showDropdown)}
                     >
-                        <p className='font-bold text-xl'>+</p>
+                        <i className="fa-solid fa-plus text-lg group-hover:rotate-90 transition-transform duration-300"></i>
 
                         {showDropdown && (
 
@@ -162,9 +164,9 @@ const InputArea = ({ setOutgoingMsg, setMsgToEdit, msgToEdit, fileData, setFileD
                             <div
                                 ref={dropdownRef}
                                 onClick={(event) => event.stopPropagation()}
-                                className='absolute w-fit h-fit bottom-[160%] -left-[150%] inset-x-0 border-[0.1px] text-white overflow-hidden rounded-lg bg-slate-950 py-1  '>
+                                className='absolute w-fit h-fit bottom-[160%] -left-[150%] inset-x-0 border border-white/20 text-white overflow-hidden rounded-xl bg-gradient-to-b from-[#1a1a2e] to-[#16213e] backdrop-blur-xl shadow-2xl shadow-purple-500/20'>
 
-                                <div className='w-[8rem] h-[9rem] flex flex-col justify-evenly items-center px-1 cursor-pointer'>
+                                <div className='w-[10rem] h-auto flex flex-col justify-evenly items-center p-2 cursor-pointer gap-1'>
 
                                     <input
                                         type="file"
@@ -183,20 +185,31 @@ const InputArea = ({ setOutgoingMsg, setMsgToEdit, msgToEdit, fileData, setFileD
                                             fileInputRef.current.click()
 
                                         }}
-                                        className='w-full h-full text-center py-2 hover:bg-zinc-800 rounded-md  duration-200'
+                                        className='w-full text-center py-3 px-4 hover:bg-purple-600/30 rounded-lg duration-200 transition-all border border-transparent hover:border-purple-500/50 flex items-center gap-3'
                                     >
-                                        Upload Image
+                                        <i className="fa-solid fa-image text-purple-400"></i>
+                                        <span>Upload Image</span>
                                     </div>
 
                                     <div
-                                        className='w-full h-full text-center py-2 hover:bg-zinc-800 rounded-md'
+                                        className='w-full text-center py-3 px-4 hover:bg-blue-600/30 rounded-lg duration-200 transition-all border border-transparent hover:border-blue-500/50 flex items-center gap-3'
                                         onClick={() => {
                                             fileInputRef.current.accept = `video/*`;
                                             fileInputRef.current.click()
                                         }}
                                     >
-                                        Upload Video</div>
-                                    <div className='w-full h-full text-center py-2 hover:bg-zinc-800 rounded-md'>Upload File</div>
+                                        <i className="fa-solid fa-video text-blue-400"></i>
+                                        <span>Upload Video</span>
+                                    </div>
+                                    <div className='w-full text-center py-3 px-4 hover:bg-green-600/30 rounded-lg duration-200 transition-all border border-transparent hover:border-green-500/50 flex items-center gap-3'
+                                        onClick={() => {
+                                            fileInputRef.current.accept = `.pdf,.txt,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar`;
+                                            fileInputRef.current.click()
+                                        }}
+                                    >
+                                        <i className="fa-solid fa-file text-green-400"></i>
+                                        <span>Upload File</span>
+                                    </div>
 
 
                                 </div>
@@ -208,8 +221,11 @@ const InputArea = ({ setOutgoingMsg, setMsgToEdit, msgToEdit, fileData, setFileD
 
 
                     {/* Send button */}
-                    <button onClick={sendMsg}>
-                        <i className="fa-regular  text-white font-bold text-2xl fa-paper-plane text-blue-200"></i>
+                    <button
+                        onClick={sendMsg}
+                        className='w-10 h-10 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 group'
+                    >
+                        <i className="fa-solid fa-paper-plane text-white text-lg group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"></i>
                     </button>
 
 

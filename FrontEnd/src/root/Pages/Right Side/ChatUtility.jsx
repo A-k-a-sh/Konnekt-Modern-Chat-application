@@ -2,88 +2,92 @@ import React from 'react'
 
 import { useRightContext } from './Right Context/RightContext'
 
-const ChatUtility = ({ dropdownRef, showDropdown, setShowDropdown, utilDropdownMsg, setUtilDropdownMsg, msg, curUserInfo , setMsgToEdit , deleteFunc }) => {
+const ChatUtility = ({ dropdownRef, showDropdown, setShowDropdown, utilDropdownMsg, setUtilDropdownMsg, msg, curUserInfo, setMsgToEdit, deleteFunc }) => {
 
 
-    const { setMsgToReply , setIsMsgSelected , setSelectedMsg} = useRightContext()
+    const { setMsgToReply, setIsMsgSelected, setSelectedMsg } = useRightContext()
 
     return (
-        <div className='relative '>
+        <div className='relative'>
 
             {/* Three dot , share */}
-            <div className={`utility  flex   items-center justify-center ${msg?.sender?.userId === curUserInfo.userId ? "flex-row" : "flex-row-reverse"} `}>
+            <div className={`utility flex gap-1 items-center justify-center ${msg?.sender?.userId === curUserInfo.userId ? "flex-row" : "flex-row-reverse"} `}>
 
                 {/* Three dot icon */}
-                <div className=''
+                <button className='w-8 h-8 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 hover:border-purple-500/50 flex items-center justify-center transition-all duration-200 hover:scale-110 group'
 
                     onClick={() => {
                         setShowDropdown(!showDropdown)
                         setUtilDropdownMsg(msg)
                     }}
                 >
-                    <i className="fa-solid fa-ellipsis-vertical px-2 py-1 rounded-full hover:bg-gray-600 w-fit h-fit"></i>
-                </div>
+                    <i className="fa-solid fa-ellipsis-vertical text-sm text-gray-400 group-hover:text-purple-400 transition-colors"></i>
+                </button>
 
-                    {/* share icon */}
-                <div
+                {/* Reply icon */}
+                <button
+                    className='w-8 h-8 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 hover:border-blue-500/50 flex items-center justify-center transition-all duration-200 hover:scale-110 group'
                     onClick={() => {
                         setMsgToReply(msg)
                         setMsgToEdit(null)
                     }}
-                    
+
                 >
-                    <i className={`fa-solid fa-share px-2 py-1 rounded-full hover:bg-gray-600 w-fit h-fit ${msg.sender.userId === curUserInfo.userId ? "fa-flip-horizontal" : ""}`}></i>
-                </div>
+                    <i className={`fa-solid fa-reply text-sm text-gray-400 group-hover:text-blue-400 transition-colors ${msg.sender.userId === curUserInfo.userId ? "fa-flip-horizontal" : ""}`}></i>
+                </button>
 
 
 
             </div>
 
 
-            {/* Edit , delete */}
+            {/* Edit , delete dropdown */}
             {
-                showDropdown && utilDropdownMsg?.msgId === msg.msgId  && msg.sender.userId === curUserInfo.userId && (
+                showDropdown && utilDropdownMsg?.msgId === msg.msgId && msg.sender.userId === curUserInfo.userId && (
                     <div
                         ref={dropdownRef}
 
-                        className={`absolute z-50 w-fit top-[-100%] border border-gray-600  py-1 px-2 rounded-lg cursor-pointer bg-black
+                        className={`absolute z-50 w-48 top-[-100%] border border-white/20 rounded-xl cursor-pointer bg-gradient-to-b from-[#1a1a2e] to-[#16213e] backdrop-blur-xl shadow-2xl shadow-purple-500/20 overflow-hidden
                         ${msg.sender.userId === curUserInfo.userId ? "left-[-80%]" : "right-[-80%]"}`}
                     >
 
-                        <div
-                            className='flex flex-row items-center py-1 opacity-80 hover:opacity-100 rounded-sm '
-                            onClick={() => deleteFunc(msg)}
-                        >
+                        <div className='p-1 space-y-1'>
+                            {/* Delete */}
+                            <div
+                                className='flex flex-row items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-600/20 border border-transparent hover:border-red-500/30 transition-all duration-200 group'
+                                onClick={() => deleteFunc(msg)}
+                            >
 
-                            <i className="fa-solid fa-trash px-2 py-1   w-fit h-fit"></i>
-                            <p>Delete</p>
-                        </div>
+                                <i className="fa-solid fa-trash text-red-400 group-hover:text-red-300 transition-colors"></i>
+                                <p className='text-sm text-white group-hover:text-red-200 transition-colors'>Delete</p>
+                            </div>
 
-                        {/* Edit */}
-                        <div
-                            className='flex flex-row items-center py-1 opacity-80 hover:opacity-100  rounded-sm'
-                            onClick={() => {
-                                setMsgToEdit({ ...msg })
-                                setMsgToReply(null)
-                            }}
-                        >
+                            {/* Edit */}
+                            <div
+                                className='flex flex-row items-center gap-3 px-3 py-2 rounded-lg hover:bg-purple-600/20 border border-transparent hover:border-purple-500/30 transition-all duration-200 group'
+                                onClick={() => {
+                                    setMsgToEdit({ ...msg })
+                                    setMsgToReply(null)
+                                }}
+                            >
 
-                            <i className="fa-solid fa-edit px-2 py-1 rounded-full w-fit h-fit"></i>
-                            <p>Edit</p>
-                        </div>
+                                <i className="fa-solid fa-pen-to-square text-purple-400 group-hover:text-purple-300 transition-colors"></i>
+                                <p className='text-sm text-white group-hover:text-purple-200 transition-colors'>Edit</p>
+                            </div>
 
-                        {/* Select */}
-                        <div
-                            className='flex flex-row items-center py-1 opacity-80 hover:opacity-100  rounded-sm'
-                            onClick={() => {
-                                setIsMsgSelected(true)
-                                setSelectedMsg((prev) => ([...prev, msg]))
+                            {/* Select */}
+                            <div
+                                className='flex flex-row items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-600/20 border border-transparent hover:border-blue-500/30 transition-all duration-200 group'
+                                onClick={() => {
+                                    setIsMsgSelected(true)
+                                    setSelectedMsg((prev) => ([...prev, msg]))
 
-                            }}
-                        >
+                                }}
+                            >
 
-                            <i className="fa-solid fa-circle-check px-2 py-1 rounded-full w-fit h-fit"></i>
-                            <p>Select Message</p>
+                                <i className="fa-solid fa-circle-check text-blue-400 group-hover:text-blue-300 transition-colors"></i>
+                                <p className='text-sm text-white group-hover:text-blue-200 transition-colors'>Select</p>
+                            </div>
                         </div>
 
                     </div>

@@ -1,5 +1,7 @@
 const express = require('express');
 const ogs = require('open-graph-scraper');
+const allUserInfo = require('./AllUserInfo');
+const allGroupsData = require('./AllGroupData');
 const app = express();
 const cors = require('cors');
 
@@ -12,17 +14,7 @@ app.use(cors({
 }))
 
 
-app.use((req, res, next) => {
-    if (Notification.permission === "granted") {
-        new Notification("Hello, world!");
-    } else if (Notification.permission !== "denied") {
-        Notification.requestPermission().then(function (permission) {
-            if (permission === "granted") {
-                new Notification("Hello, world!");
-            }
-        });
-    }
-})
+
 
 app.get('/link-preview', async (req, res) => {
     try {
@@ -55,6 +47,9 @@ app.get('/home', async (req, res) => {
 })
 
 
+app.get('/api/users', (req, res) => res.json(allUserInfo));
+app.get('/api/groups', (req, res) => res.json(allGroupsData));
+
 const port = 4000;
 
 const { Server } = require('socket.io');
@@ -86,6 +81,7 @@ const register = require('./socketHandler/register')
 const message = require('./socketHandler/message')
 const messageUtil = require('./socketHandler/messageUtil')
 const isOnline = require('./socketHandler/isOnline')
+const groupOperations = require('./socketHandler/groupOperations')
 
 io.on('connection', (socket) => {
     //console.log('a user connected with id: ' + socket.id)
@@ -96,6 +92,8 @@ io.on('connection', (socket) => {
     message(io, socket, users, groupRooms);
     messageUtil(io, socket, users, groupRooms);
     isOnline(io, socket, users, groupRooms);
+    groupOperations(io, socket, users, groupRooms);
+
 
 
 

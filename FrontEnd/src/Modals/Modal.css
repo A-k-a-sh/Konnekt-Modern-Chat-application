@@ -1,49 +1,89 @@
-/* styles.css or global.css */
-.custom-ant-modal .ant-modal-content {
-    background-color: rgba(65, 64, 64, 0.923); /* Tailwind's bg-gray-800 */
-    color: white;
-  }
-  
-  .custom-ant-modal .ant-modal-header {
-    background-color: rgba(65, 64, 64, 0); /* Tailwind's bg-gray-800 */
-    color: white;
+/* Modern Modal Styling */
 
-  }
-  
-.custom-ant-modal .ant-modal-body{
-  /* border: 2px solid red; */
+/* Delete Modal */
+.custom-ant-modal-delete .ant-modal-content {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 25px 50px -12px rgba(139, 92, 246, 0.25);
+  color: white;
 }
 
-/* Style both OK and Cancel buttons */
+.custom-ant-modal-delete .ant-modal-header {
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.custom-ant-modal-delete .ant-modal-body {
+  padding: 0;
+}
+
+.custom-ant-modal-delete .ant-modal-footer {
+  background: transparent;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 16px 24px;
+}
+
+/* General Modal Styling */
+.custom-ant-modal .ant-modal-content {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 25px 50px -12px rgba(139, 92, 246, 0.25);
+  color: white;
+}
+
+.custom-ant-modal .ant-modal-header {
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.custom-ant-modal .ant-modal-body {
+  color: white;
+}
+
+.custom-ant-modal .ant-modal-footer {
+  background: transparent;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Button Styling */
 .custom-ant-modal .ant-btn {
   color: white;
-  
+  border-radius: 8px;
 }
 
-/* Style only the primary OK button */
 .custom-ant-modal .ant-btn-primary {
-  background-color: transparent;
-  /* border-color: red; */
-  outline: none;
-  border : 2px solid white;
+  background: linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%);
+  border: 1px solid rgba(139, 92, 246, 0.5);
   color: white;
 }
 
-
-.custom-ant-modal:hover .ant-btn-primary:hover {
-  outline: none;
-  background-color: gray;
-
+.custom-ant-modal .ant-btn-primary:hover {
+  background: linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%);
+  border-color: rgba(139, 92, 246, 0.7);
 }
-/* Optional: style only the Cancel button */
+
 .custom-ant-modal .ant-btn-default {
-  background-color: transparent;
-  border-color: white;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: white;
 }
 
+.custom-ant-modal .ant-btn-default:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
 
-  .custom-ant-modal .ant-modal-footer {
-    
-  }
-  
+/* Close button */
+.custom-ant-modal .ant-modal-close {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.custom-ant-modal .ant-modal-close:hover {
+  color: rgba(255, 255, 255, 1);
+}

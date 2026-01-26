@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 import { useAllContext } from '../../../Context/AllContext'
 import { usePanelContext } from '../../../Context/PanelContext'
-import { useIsOnline } from './SocketConnection'
+import { useIsOnline } from '../../../hooks'
 import { useRightContext } from './Right Context/RightContext'
 import Avatar from '@mui/joy/Avatar';
 import AvatarGroup from '@mui/joy/AvatarGroup';

@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
+import { socket } from '../services/socket.service';
 
 const hydrateGroups = (groups, users) => {
     if (!groups || !users) return [];
@@ -17,8 +18,6 @@ const hydrateGroups = (groups, users) => {
 
 const AllinfoContext = createContext()
 const AllContext = ({ children }) => {
-
-    console.log("All context");
     const [allMessages, setAllMessages] = useState([])
     const [userInfo, setUserInfo] = useState(null)
     const [isAuth, setIsAuth] = useState(false)
@@ -41,16 +40,28 @@ const AllContext = ({ children }) => {
                 const groups = await groupsRes.json();
 
                 setAllUserInfo(users);
-                setAllGroupsData(hydrateGroups(groups, users));
+                const hydratedGroups = hydrateGroups(groups, users);
+                setAllGroupsData(hydratedGroups);
 
-                // Mock Auto-Login for User 1 (Akash) to restore dev state
+                // Auto-login disabled - user must select via ModalSelectUser
+                // Uncomment below to enable auto-login for development:
+                /*
                 const currentUser = users.find(u => u.userId === 1);
                 if (currentUser) {
                     setUserInfo(currentUser);
-                    setConnected_to(currentUser.connected_to || []);
-                    setJoined_groupsInfo(currentUser.joined_groups || []); // Assuming joined_groups exists
+                    const connectedUsers = currentUser.connected_to || [];
+                    setConnected_to(connectedUsers);
+                    const joinedGroupIds = currentUser.joined_groups || [];
+                    const joinedGroups = hydratedGroups.filter(g => joinedGroupIds.includes(g.groupId));
+                    setJoined_groupsInfo(joinedGroups);
                     setIsAuth(true);
+                    try {
+                        socket.emit('register', { userId: currentUser.userId });
+                    } catch (error) {
+                        console.error('Failed to register socket for auto-login:', error);
+                    }
                 }
+                */
 
             } catch (err) {
                 console.error("Failed to fetch data from Backend API. Ensure server is running on port 4000.", err);
@@ -58,6 +69,27 @@ const AllContext = ({ children }) => {
         };
         fetchData();
     }, []);
+
+    // Socket event listener for auto-logged user
+    useEffect(() => {
+        if (!userInfo?.userId) return;
+
+        const handleGetLoggedInUserInfo = ({ userInfo: updatedUser, connected_to: connectedUsers, joined_groupsInfo: joinedGroups }) => {
+            try {
+                if (updatedUser) setUserInfo(updatedUser);
+                if (connectedUsers) setConnected_to(connectedUsers);
+                if (joinedGroups) setJoined_groupsInfo(joinedGroups);
+            } catch (error) {
+                console.error('Error handling socket user info:', error);
+            }
+        };
+
+        socket.on('getLoggedInUserInfo', handleGetLoggedInUserInfo);
+
+        return () => {
+            socket.off('getLoggedInUserInfo', handleGetLoggedInUserInfo);
+        };
+    }, [userInfo?.userId]);
 
     const [mediaUploading, setMediaUploading] = useState(false)
 

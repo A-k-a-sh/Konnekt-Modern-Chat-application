@@ -2,20 +2,22 @@ import React, { useEffect, useRef } from 'react';
 import EmojiPicker from 'emoji-picker-react';
 
 
-import { editMsg, handleSubmit, useChangeMessage } from '../Right Side/SocketConnection';
+import { useChangeMessage } from '../../../hooks';
+import { uploadToCloudinary } from '../../../services';
+import { editMsg, handleSubmit } from '../../../utils';
 
 import { useAllContext } from '../../../Context/AllContext';
 import { useState } from 'react';
-import { useClickOutside } from '../../../Custom hook/ClickOutside';
+import { useClickOutside } from '../../../hooks';
 
-import { cloudinaryUpload } from '../../../utility/cloudinaryUpload';
+import { uploadToCloudinary as cloudinaryUpload } from '../../../services';
 import { TexAreaFunctions } from './functions';
 
 import { useRightContext } from '../Right Side/Right Context/RightContext';
 
 const InputArea = ({ setOutgoingMsg, setMsgToEdit, msgToEdit, fileData, setFileData }) => {
 
-    const { parentRef, childRef, setSelectedChatToChangBg, msgToReply, setMsgToReply } = useRightContext()
+    const { parentRef, setMessageRef, getMessageRef, MsgAreaDivRef, msgToReply, setMsgToReply } = useRightContext()
     const { setMediaUploading, selectedUser, userInfo, selectedGroup, setAllMessages } = useAllContext()
 
     const textareaRef = useRef(null);
@@ -32,7 +34,13 @@ const InputArea = ({ setOutgoingMsg, setMsgToEdit, msgToEdit, fileData, setFileD
 
 
     const scrollToDiv = (msg) => {
-        TexAreaFunctions.scrollToDiv(childRef, msg, setSelectedChatToChangBg)
+        const element = getMessageRef(msg.msgId);
+        if (element) {
+            element.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest'
+            });
+        }
     }
 
 

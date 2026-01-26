@@ -53,7 +53,7 @@ const LeftBottomChat = () => {
                                     <div className='relative flex-shrink-0'>
                                         <div className='w-12 h-12 rounded-full overflow-hidden ring-2 ring-white/10 group-hover:ring-purple-500/50 transition-all duration-300'>
                                             <img
-                                                src={user?.profilePhoto}
+                                                src={user?.image || user?.profilePhoto}
                                                 alt={user?.userName}
                                                 className='w-full h-full object-cover'
                                             />

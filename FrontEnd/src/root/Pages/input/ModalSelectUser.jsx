@@ -8,7 +8,7 @@ import './ModalSelectUser.css';
 
 import { useAllContext } from '../../../Context/AllContext';
 import { useEffect, useState } from 'react';
-import { useSocketConnection } from '../Right Side/SocketConnection';
+import { useSocketConnection } from '../../../hooks';
 
 
 
@@ -19,21 +19,15 @@ export default function ModalSelectUser() {
 
     const [selectedValue, setSelectedValue] = useState(null);
 
-    const { userInfo, setUserInfo , setConnected_to, setJoined_groupsInfo } = useAllContext()
+    const { userInfo, setUserInfo , setConnected_to, setJoined_groupsInfo, allUserInfo } = useAllContext()
 
     useSocketConnection({userId : selectedValue}, setUserInfo ,setConnected_to , setJoined_groupsInfo);
 
       
 
-    const handleSelect = (value) => {
-
-
-
-        setSelectedValue(value);
-
+    const handleSelect = (userId) => {
+        setSelectedValue(userId);
         setOpen(false);
-
-
     };
 
 
@@ -72,7 +66,12 @@ export default function ModalSelectUser() {
                 aria-labelledby="modal-title"
                 aria-describedby="modal-desc"
                 open={open}
-                onClose={() => { if (!user) check }}
+                onClose={(event, reason) => {
+                    // Prevent closing if no user is logged in
+                    if (!userInfo && reason === 'backdropClick') {
+                        return;
+                    }
+                }}
                 sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
             >
                 <Sheet
@@ -98,15 +97,23 @@ export default function ModalSelectUser() {
 
                         id="modal-desc" >
                         <div className="list-none">
-                            {[1, 2, 3, 4, 5].map((item, index) => (
+                            {allUserInfo.map((user, index) => (
                                 <li
-                                    key={index}
-                                    className={`cursor-pointer px-4 py-2 border 
-              ${selectedValue === item ? "bg-[#232222e6] text-white" : null}`}
-                                    onClick={() => handleSelect(item)}
+                                    key={user.userId}
+                                    className={`cursor-pointer px-4 py-3 border border-gray-700 hover:bg-[#232222e6] transition-colors flex items-center gap-3
+              ${selectedValue === user.userId ? "bg-[#232222e6] text-white" : ""}`}
+                                    onClick={() => handleSelect(user.userId)}
 
                                 >
-                                    {item}
+                                    <img 
+                                        src={user.image || '/default-avatar.png'} 
+                                        alt={user.userName}
+                                        className="w-10 h-10 rounded-full object-cover"
+                                    />
+                                    <div>
+                                        <p className="font-semibold">{user.userName}</p>
+                                        <p className="text-xs text-gray-400">{user.email}</p>
+                                    </div>
                                 </li>
                             ))}
                         </div>

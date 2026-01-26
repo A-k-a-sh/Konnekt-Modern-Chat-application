@@ -2,8 +2,9 @@ import React, { useState } from 'react'
 import { useAllContext } from '../../../Context/AllContext'
 import { useLocation } from 'react-router-dom'
 import ModalImageShow from '../../../Modals/ModalImageShow'
-import { getCloudinaryDownloadUrl } from '../../../utility/cloudinaryDownload'
-import { useIsOnline, socket } from '../Right Side/SocketConnection'
+import { downloadFile } from '../../../services'
+import { useIsOnline } from '../../../hooks'
+import { socket } from '../../../services'
 
 const UserGroupDetails = () => {
     const { selectedUser, setSelectedUser, selectedGroup, setSelectedGroup, userInfo, joined_groupsInfo, connected_to, allGroupsData } = useAllContext()

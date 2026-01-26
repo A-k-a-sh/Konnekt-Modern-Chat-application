@@ -18,7 +18,18 @@ export default defineConfig({
     fs: {
       allow: ['..']
     }
+  },
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-socket': ['socket.io-client'],
+          'vendor-ui': ['@mui/joy', 'antd'],
+          'vendor-utils': ['axios', 'crypto-js', 'emoji-picker-react']
+        }
+      }
+    }
   }
 })
-
-

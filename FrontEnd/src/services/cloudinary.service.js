@@ -1,15 +1,10 @@
-
 import CryptoJS from "crypto-js";
 
-
-
-
-
-const CLOUD_NAME ='don2ndgoj'
-const API_KEY='786234832985487'
-const API_SECRET= '1jvjkRmNN-bjpM8AFm66jD3yBBw'
-
-const CLOUDINARY_URL= `cloudinary:${API_KEY}:${API_SECRET}@don2ndgoj`
+const CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'don2ndgoj';
+const API_KEY = import.meta.env.VITE_CLOUDINARY_API_KEY;
+const API_SECRET = import.meta.env.VITE_CLOUDINARY_API_SECRET;
+const UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'ChatAppMedia';
+const FOLDER = import.meta.env.VITE_CLOUDINARY_FOLDER || 'ChatApp';
 
 export const cloudinaryUpload = async (fileInfo) => {
 
@@ -24,16 +19,16 @@ export const cloudinaryUpload = async (fileInfo) => {
     const data = new FormData()
 
     data.append('file', file)
-    data.append('upload_preset', 'ChatAppMedia')
-    data.append('cloud_name', 'don2ndgoj')
-    data.append('folder' , 'ChatApp')
+    data.append('upload_preset', UPLOAD_PRESET)
+    data.append('cloud_name', CLOUD_NAME)
+    data.append('folder', FOLDER)
     data.append('quality' , 'auto')
 
 
 
     try {
 
-        const response = await fetch(`https://api.cloudinary.com/v1_1/don2ndgoj/${fileType}/upload`, {
+        const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${fileType}/upload`, {
             method: "POST",
             body: data,
 

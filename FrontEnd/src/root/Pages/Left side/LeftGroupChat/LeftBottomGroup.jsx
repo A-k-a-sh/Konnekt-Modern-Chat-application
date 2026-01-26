@@ -55,7 +55,7 @@ const LeftBottomGroup = () => {
                     </div>
                     {/* Member count badge */}
                     <div className='absolute -bottom-1 -right-1 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center border-2 border-[#1a1a2e]'>
-                      {group.members?.length || '0'}
+                      {group.groupMembers?.length || '0'}
                     </div>
                   </div>
 
@@ -65,7 +65,7 @@ const LeftBottomGroup = () => {
                       {group.groupName}
                     </p>
                     <p className='text-xs text-gray-400 truncate mt-0.5'>
-                      {group.members?.length || 0} members
+                      {group.groupMembers?.length || 0} members
                     </p>
                   </div>
 

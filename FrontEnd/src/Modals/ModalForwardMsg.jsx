@@ -11,7 +11,7 @@ import ModalClose from '@mui/joy/ModalClose';
 import DialogTitle from '@mui/joy/DialogTitle';
 import Stack from '@mui/joy/Stack';
 import AllContext, { useAllContext } from '../Context/AllContext';
-import { handleSubmit } from '../root/Pages/Right Side/SocketConnection';
+import { handleSubmit } from '../utils';
 
 
 export default function ModalForwardMsg({ forwardMsgModalOpen, setForwardMsgModalOpen, selectedMsg, setSelectedMsg }) {

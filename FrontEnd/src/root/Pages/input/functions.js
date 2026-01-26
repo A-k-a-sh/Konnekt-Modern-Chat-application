@@ -1,7 +1,7 @@
 
-import { editMsg, deleteMsg, handleSubmit, replyMsgToSocket } from "../Right Side/SocketConnection";
+import { editMsg, deleteMsg, handleSubmit } from "../../../utils";
 
-import { cloudinaryUpload, cloudinaryDelete } from "../../../utility/cloudinaryUpload";
+import { uploadToCloudinary as cloudinaryUpload, deleteFromCloudinary as cloudinaryDelete } from "../../../services";
 
 
 import { useEffect } from "react";
@@ -118,22 +118,6 @@ export const TexAreaFunctions = {
             textarea.style.overflowY = newHeight > maxHeight ? "scroll" : "hidden";
 
         }, [msg]);
-    },
-
-    scrollToDiv: (childRef, msg, setSelectedChatToChangBg) => {
-        if (childRef.current[msg.msgId]) {
-            childRef.current[msg.msgId].scrollIntoView({
-                behavior: 'smooth',
-                block: 'nearest'
-            });
-        }
-
-        setSelectedChatToChangBg(msg.msgId)
-
-        setTimeout(() => {
-            setSelectedChatToChangBg(null)
-        }, 2000);
     }
-
 
 }

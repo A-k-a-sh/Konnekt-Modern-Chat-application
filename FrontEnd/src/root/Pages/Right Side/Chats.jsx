@@ -1,22 +1,22 @@
 import React, { useEffect, useRef, useState } from 'react'
 import axios from 'axios';
 
-import { cloudinaryDelete } from '../../../utility/cloudinaryUpload';
-import { getCloudinaryDownloadUrl } from '../../../utility/cloudinaryDownload';
-import { useChangeMessage } from './SocketConnection';
+import { deleteFromCloudinary as cloudinaryDelete } from '../../../services';
+import { downloadFile as getCloudinaryDownloadUrl } from '../../../services';
+import { useChangeMessage } from '../../../hooks';
 
-import { deleteMsg } from './SocketConnection';
-import { useClickOutside } from '../../../Custom hook/ClickOutside';
+import { deleteMsg } from '../../../utils';
+import { useClickOutside } from '../../../hooks';
 
 import { useAllContext } from '../../../Context/AllContext';
 
 import { useRightContext } from './Right Context/RightContext';
 
-import { multiFormatDateString } from '../../../utility/DateTime';
+import { formatDateTime as multiFormatDateString } from '../../../utils';
 
 import './Right.css'
 
-import Loader from '../../../utility/Loader';
+import Loader from '../../../Components/Loader';
 import ChatUtility from './ChatUtility';
 
 import { TexAreaFunctions } from '../input/functions';
@@ -25,19 +25,22 @@ const Chats = ({ messages, setAllMessages, curUserInfo, showMediaFunction, setMs
     const [previews, setPreviews] = useState(null);
 
 
-    const { parentRef, childRef, selectedChatToChangBg, setSelectedChatToChangBg, setMsgToReply, selectedMsg, setSelectedMsg, isMsgSelected,
+    const { parentRef, setMessageRef, getMessageRef, selectedChatToChangBg, setSelectedChatToChangBg, setMsgToReply, selectedMsg, setSelectedMsg, isMsgSelected,
         setIsMsgSelected } = useRightContext()
-
-    //childRef - this for scrolling to the specific message
-    //parentRef - idk
 
     const { mediaUploading, selectedGroup } = useAllContext()
 
     const scrollToDiv = (msg) => {
-        TexAreaFunctions.scrollToDiv(childRef, msg, setSelectedChatToChangBg)
+        const element = getMessageRef(msg.msgId);
+        if (element) {
+            element.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest'
+            });
+            setSelectedChatToChangBg(msg.msgId);
+            setTimeout(() => setSelectedChatToChangBg(null), 2000);
+        }
     }
-
-    console.log(isMsgSelected);
 
 
 
@@ -52,7 +55,6 @@ const Chats = ({ messages, setAllMessages, curUserInfo, showMediaFunction, setMs
 
 
     const deleteFunc = async (msg) => {
-        // console.log(msg);
         setAllMessages((prev) => prev.filter((m) => m.msgId !== msg.msgId));
 
         // remove reply
@@ -153,11 +155,6 @@ const Chats = ({ messages, setAllMessages, curUserInfo, showMediaFunction, setMs
         return urls.length > 0
     }
 
-    console.log(messages);
-
-
-    console.log(selectedMsg);
-
     return (
         <div
             className={` textMsg w-[85%] flex mx-auto gap-3 flex-col borde border-red-500   h-auto  pb-4 pt-4 ${mediaUploading ? "items-end" : ""}`}
@@ -189,9 +186,7 @@ const Chats = ({ messages, setAllMessages, curUserInfo, showMediaFunction, setMs
                         }
                     }}
 
-
-
-                    ref={(el) => (childRef.current[msg.msgId] = el)}
+                    ref={(el) => setMessageRef(msg.msgId, el)}
                 >
 
                     {/* Text div includes utility */}

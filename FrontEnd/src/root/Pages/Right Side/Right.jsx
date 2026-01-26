@@ -6,7 +6,7 @@ import InputArea from '../input/TextArea'
 import './Right.css'
 import ModalSelectUser from '../input/ModalSelectUser'
 
-import { clearMessages, handleSocketMessage } from './SocketConnection'
+import { useSocketMessage } from '../../../hooks'
 import Chats from './Chats'
 import ModalImageShow from '../../../Modals/ModalImageShow'
 
@@ -34,9 +34,7 @@ const Right = () => {
         setIsMsgSelected(false)
     }, [selectedGroup, selectedUser])
 
-    handleSocketMessage(setAllMessages)
-
-    // clearMessages(setAllMessages, setImages, selectedUser)
+    useSocketMessage(setAllMessages)
 
     // Filter messages based on selected user or group
     const filteredMessages = useMemo(() => {
@@ -185,17 +183,12 @@ const Right = () => {
         ) : (
 
             <div className='w-full h-screen flex justify-center items-center relative bg-black '>
-                <p className='text-3xl'>Please select a user</p>
-
-                <div className='h-[0rem] absolute top-[-999%]'>
-                    <ModalSelectUser />
-                </div>
+                <ModalSelectUser />
             </div>
         )
 
     )
 }
-
 
 export default Right
 

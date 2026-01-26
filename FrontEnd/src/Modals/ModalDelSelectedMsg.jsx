@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Button, Modal } from 'antd';
 
-import { delSelectedMsg, handleSelectedMsg } from '../root/Pages/Right Side/SocketConnection';
+import { delSelectedMsg } from '../utils';
 
 
 import './Modal.css'
@@ -19,9 +19,6 @@ function ModalDelSelectedMsg({ deleteModalOpen, setDeleteModalOpen }) {
 
     const [confirmLoading, setConfirmLoading] = useState(false);
     const [modalText, setModalText] = useState('Are you sure you want to delete this message?');
-
-
-    handleSelectedMsg(selectedMsg, setAllMessages)
 
     const showModal = () => {
         setDeleteModalOpen(true);
@@ -43,7 +40,6 @@ function ModalDelSelectedMsg({ deleteModalOpen, setDeleteModalOpen }) {
         }, 2000);
     };
     const handleCancel = () => {
-        console.log('Clicked cancel button');
         setDeleteModalOpen(false);
     };
 

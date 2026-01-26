@@ -1,11 +1,11 @@
-import React, { createContext, useContext, useRef, useState } from 'react'
+import React, { createContext, useContext, useRef, useState, useCallback } from 'react'
 
 
 const RightInfoContext = createContext()
 const RightContext = ({ children }) => {
 
-    const parentRef = useRef(null);  //idk
-    const childRef = useRef([]) //this for scrolling to the specific message
+    const parentRef = useRef(null);
+    const childRefsMap = useRef(new Map()); // Use Map for better memory management
     const [selectedChatToChangBg, setSelectedChatToChangBg] = useState(null)
 
     const [msgToReply, setMsgToReply] = useState(null)
@@ -15,10 +15,26 @@ const RightContext = ({ children }) => {
 
     const MsgAreaDivRef = useRef(null);
 
+    // Helper to set ref callback for messages
+    const setMessageRef = useCallback((msgId, element) => {
+        if (element) {
+            childRefsMap.current.set(msgId, element);
+        } else {
+            childRefsMap.current.delete(msgId);
+        }
+    }, []);
+
+    // Helper to get ref for scrolling
+    const getMessageRef = useCallback((msgId) => {
+        return childRefsMap.current.get(msgId);
+    }, []);
+
 
     const value = {
         parentRef,
-        childRef,
+        childRefsMap,
+        setMessageRef,
+        getMessageRef,
         selectedChatToChangBg,
         setSelectedChatToChangBg,
         msgToReply,

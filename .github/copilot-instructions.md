@@ -24,9 +24,18 @@ Backend socket handlers are modularized in `BackEnd/socketHandler/`:
 Three React Contexts manage global state:
 - **`AllContext.jsx`** - User info, messages, online status, all users/groups data. Fetches initial data from `/api/users` and `/api/groups` on mount.
 - **`PanelContext.jsx`** - UI panel visibility (modals, sidebars)
-- **`RightContext.jsx`** - Chat area-specific state (selected messages, message area ref)
+- **`RightContext.jsx`** - Chat area-specific state (selected messages, message area ref using Map with automatic cleanup)
 
 **Auto-login**: `AllContext` mocks login as userId=1 (Akash) for development convenience.
+
+**Socket Hooks** (modular architecture in `hooks/`):
+- `useSocketConnection` - Initial registration, user info hydration
+- `useSocketMessage` - Incoming message listener with browser notifications
+- `useChangeMessage` - Message edit/delete event handler
+- `useIsOnline` - Real-time presence detection
+- `useSelectedMessageDelete` - Bulk message deletion
+
+**Socket Service** (`services/socket.service.js`): Exports singleton socket instance initialized with `VITE_SOCKET_URL`
 
 ### Message Routing Logic
 - **Private chats**: Backend emits to both sender and receiver socket IDs via `users[userId]` mapping
@@ -40,12 +49,19 @@ Three React Contexts manage global state:
 ```bash
 # Terminal 1 - Backend
 cd BackEnd
+cp .env.example .env  # First time only - configure your values
 node index.js  # No hot-reload, restart manually after changes
 
 # Terminal 2 - Frontend  
 cd FrontEnd
+cp .env.example .env  # First time only - add Cloudinary credentials
 npm run dev    # Vite dev server with HMR at http://localhost:5173
 ```
+
+**Environment Setup:**
+- Backend requires `.env` with PORT, CORS_ORIGINS, SOCKET_ORIGINS
+- Frontend requires `.env` with VITE_SOCKET_URL and Cloudinary credentials
+- See `.env.example` files for required variables
 
 ### Socket Event Debugging
 - Check `BackEnd/index.js` console logs for event registration
@@ -55,8 +71,8 @@ npm run dev    # Vite dev server with HMR at http://localhost:5173
 ### Adding New Socket Events
 1. Create handler in `BackEnd/socketHandler/` or extend existing
 2. Register in `BackEnd/index.js` connection callback
-3. Emit from frontend via `socket.emit('eventName', payload)`
-4. Listen in frontend via `socket.on('eventName', callback)` in `SocketConnection.js` custom hooks
+3. Emit from frontend via `socket.emit('eventName', payload)` using utilities in `utils/socketEmitters.util.js`
+4. Listen in frontend via dedicated custom hook in `hooks/` directory (follow pattern from existing socket hooks)
 
 ## Project-Specific Conventions
 
@@ -64,7 +80,15 @@ npm run dev    # Vite dev server with HMR at http://localhost:5173
 - **Frontend components**: PascalCase `.jsx` files (e.g., `ModalImageShow.jsx`)
 - **Backend handlers**: camelCase `.js` files (e.g., `groupOperations.js`)
 - **Context hooks**: Export `useContextName` alongside Context (e.g., `useAllContext`)
-- **Socket utilities**: Organized in `FrontEnd/src/root/Pages/Right Side/SocketConnection.js`
+- **Modular architecture**:
+  - `hooks/` - Custom React hooks (useSocketConnection, useSocketMessage, etc.)
+  - `services/` - External integrations (socket.service.js, cloudinary.service.js)
+  - `utils/` - Pure utility functions (socketEmitters.util.js, dateTime.util.js)
+  - `constants/` - App-wide constants (app.constants.js)
+- **Barrel exports**: Each directory has `index.js` for clean imports
+  - Import hooks: `import { useSocketMessage } from '../hooks'`
+  - Import services: `import { socket, uploadToCloudinary } from '../services'`
+  - Import utils: `import { deleteMsg, formatDateTime } from '../utils'`
 
 ### Data Structure Patterns
 - **User objects**: Always include `{userId, userName, email, bio, image}` for consistency
@@ -73,13 +97,16 @@ npm run dev    # Vite dev server with HMR at http://localhost:5173
 - **Group hydration**: `AllContext` hydrates groups with full user details via `hydrateGroups()` helper
 
 ### Media Handling
-Cloudinary integration via `cloudinaryUpload.js`:
-- **Upload preset**: `ChatAppMedia` 
-- **Folder**: `ChatApp`
+Cloudinary integration via environment variables:
+- **Configuration**: `FrontEnd/.env` contains all Cloudinary credentials
+- **Upload preset**: Defined in VITE_CLOUDINARY_UPLOAD_PRESET
+- **Folder**: Defined in VITE_CLOUDINARY_FOLDER
 - **Resource types**: `image`, `video`, `raw` (for documents)
+- **Service**: All upload/delete operations in `services/cloudinary.service.js`
+- **Download**: File download utilities in `services/cloudinaryDownload.service.js`
 - Returns `{url, public_id, resource_type}` for embedding in messages
 
-**Critical**: Credentials exposed in `cloudinaryUpload.js` - externalize to env variables for production
+**Security**: All credentials now in `.env` files (not committed to git)
 
 ### Styling Approach
 - **Tailwind utility-first** for layout/spacing
@@ -91,26 +118,49 @@ Cloudinary integration via `cloudinaryUpload.js`:
 ### REST API Endpoints (Express)
 - `GET /api/users` - Returns `AllUserInfo` array
 - `GET /api/groups` - Returns `AllGroupData` array  
-- `GET /link-preview?url=...` - Open Graph scraper for URL previews
-- All proxied via Vite proxy (`/api` → `http://localhost:4000`)
+- `GET /link-preview?url=...` - Open Grconfigured in `vite.config.js`)
 
 ### CORS Configuration
-Backend allows origins: `localhost:5173`, `192.168.0.104:5173`, ngrok tunnel. Update both `index.js` and Socket.IO config when adding new origins.
+Backend uses environment variables for allowed origins:
+- `CORS_ORIGINS` - Comma-separated list for Express CORS
+- `SOCKET_ORIGINS` - Comma-separated list for Socket.IO
+- Update `BackEnd/.env` when adding new origins (e.g., production domains)
+Backend allows origins: `localhost:5173`, `192.16via `useSocketMessage` hook to update `allMessages` state
+
+**Socket Hooks:**
+- `useSocketConnection` - Initial registration and user info
+- `useSocketMessage` - Listens for new messages
+- `useChangeMessage` - Handles message edits/deletes
+- `useIsOnline` - Real-time presence detectionUpdate both `index.js` and Socket.IO config when adding new origins.
 
 ### Socket Connection Lifecycle
 1. Frontend registers user on mount via `useSocketConnection` custom hook
 2. Backend assigns `socket.id` to `users[userId]` map
 3. Backend joins user to all group rooms from `joined_groups[]`
 4. Backend emits `getLoggedInUserInfo` with hydrated connected users and groups
-5. Frontend listens for `receivedMessage` events to update `allMessages` state
+5. Frontend listens for `receivedMessage` events to update `allMessages` state via `useSocketMessage` hook
+
+**Socket Hooks:**
+- `useSocketConnection` - Initial registration and user info
+- `useSocketMessage` - Listens for new messages with browser notifications
+- `useChangeMessage` - Handles message edits/deletes
+- `useIsOnline` - Real-time presence detection
+- `useSelectedMessageDelete` - Bulk message deletion
+
+**Socket Emitters** (`utils/socketEmitters.util.js`):
+- `deleteMsg` - Delete single message
+- `editMsg` - Edit message content
+- `handleSubmit` - Send new message (private/group)
+- `delSelectedMsg` - Delete multiple selected messages
 
 ## Common Gotchas
 
-- **Message duplication**: Sender receives their own message via separate emit to avoid showing messages twice - check `message.js` logic
+- **Duplicate messages**: Backend should emit to sender separately from receivers to avoid double display - check `message.js` logic
 - **Group room names**: Using `groupId` as room identifier (not `groupName`) for uniqueness
 - **Context re-renders**: `AllContext` wraps entire app - avoid unnecessary state updates
-- **Socket cleanup**: `SocketConnection.js` hooks return cleanup functions - ensure proper unmounting
-- **Notification permissions**: Browser notification logic in `handleSocketMessage` - requires user permission grant
+- **Socket cleanup**: All socket hooks implement proper cleanup functions
+- **Ref management**: Message refs use Map with automatic cleanup (via `setMessageRef` callback)
+- **Notification permissions**: Browser notification logic in `useSocketMessage` hook - requires user permission grant
 
 ## Testing User Flows
 

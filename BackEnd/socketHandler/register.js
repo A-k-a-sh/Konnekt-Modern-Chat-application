@@ -31,12 +31,6 @@ module.exports = (io, socket, users, groupRooms) => {
             groupRooms[grpId] = grpId;
         })
 
-        // joined_groupsInfo.forEach((grp) => {
-        //     socket.join(grp.groupId);
-        //     groupRooms[grp.groupId] = grp.groupName;
-        // })
-
-        console.log(`User ${userInfo.userName} registered with id: ${socket.id}`);
 
         io.to(users[credintials.userId]).emit('getLoggedInUserInfo', { userInfo, connected_to, joined_groupsInfo });
 

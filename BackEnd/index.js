@@ -4,17 +4,14 @@ const allUserInfo = require('./AllUserInfo');
 const allGroupsData = require('./AllGroupData');
 const app = express();
 const cors = require('cors');
+require('dotenv').config();
 
-
-
+const corsOrigins = process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ['http://localhost:5173'];
 
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://192.168.0.104:5173', 'http://1ec0-114-130-121-22.ngrok-free.app'],
+    origin: corsOrigins,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
 }))
-
-
-
 
 app.get('/link-preview', async (req, res) => {
     try {
@@ -50,7 +47,7 @@ app.get('/home', async (req, res) => {
 app.get('/api/users', (req, res) => res.json(allUserInfo));
 app.get('/api/groups', (req, res) => res.json(allGroupsData));
 
-const port = 4000;
+const port = process.env.PORT || 4000;
 
 const { Server } = require('socket.io');
 
@@ -59,22 +56,17 @@ const { createServer } = require('http');
 
 const server = createServer(app);
 
-
+const socketOrigins = process.env.SOCKET_ORIGINS ? process.env.SOCKET_ORIGINS.split(',') : ['http://localhost:5173'];
 
 const io = new Server(server, {
     cors: {
-        origin: ['http://localhost:5173', 'http://192.168.0.104:5173', 'http://1ec0-114-130-121-22.ngrok-free.app'],
-        // origin : 'all' ,
+        origin: socketOrigins,
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
-        //credentials: true,
     }
 })
 
 const users = {};
 const groupRooms = {};
-
-
-const privateRooms = {}; // New: Map user pairs to a private room name
 
 
 const register = require('./socketHandler/register')
@@ -84,10 +76,6 @@ const isOnline = require('./socketHandler/isOnline')
 const groupOperations = require('./socketHandler/groupOperations')
 
 io.on('connection', (socket) => {
-    //console.log('a user connected with id: ' + socket.id)
-
-
-
     register(io, socket, users, groupRooms);
     message(io, socket, users, groupRooms);
     messageUtil(io, socket, users, groupRooms);

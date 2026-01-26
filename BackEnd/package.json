@@ -9,6 +9,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "dotenv": "^17.2.3",
     "express": "^4.21.2",
     "open-graph-scraper": "^6.10.0",
     "socket.io": "^4.8.1",

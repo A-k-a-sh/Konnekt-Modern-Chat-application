@@ -5,8 +5,6 @@ module.exports = (io, socket, users, groupRooms) => {
 
     // Send join request to group
     socket.on('groupJoinRequest', ({ groupId, userId }) => {
-        console.log(`User ${userId} requesting to join group ${groupId}`);
-
         const group = allGroupsData.find(g => g.groupId === groupId);
         const user = AllUserInfo.find(u => u.userId === userId);
 
@@ -37,8 +35,6 @@ module.exports = (io, socket, users, groupRooms) => {
 
     // Cancel join request
     socket.on('cancelJoinRequest', ({ groupId, userId }) => {
-        console.log(`User ${userId} canceling join request for group ${groupId}`);
-
         const group = allGroupsData.find(g => g.groupId === groupId);
 
         if (group) {
@@ -57,8 +53,6 @@ module.exports = (io, socket, users, groupRooms) => {
 
     // Approve join request (admin only)
     socket.on('approveJoinRequest', ({ groupId, userId, adminId }) => {
-        console.log(`Admin ${adminId} approving user ${userId} for group ${groupId}`);
-
         const group = allGroupsData.find(g => g.groupId === groupId);
         const user = AllUserInfo.find(u => u.userId === userId);
 
@@ -101,8 +95,6 @@ module.exports = (io, socket, users, groupRooms) => {
 
     // Reject join request (admin only)
     socket.on('rejectJoinRequest', ({ groupId, userId, adminId }) => {
-        console.log(`Admin ${adminId} rejecting user ${userId} for group ${groupId}`);
-
         const group = allGroupsData.find(g => g.groupId === groupId);
 
         if (group && group.adminId === adminId) {

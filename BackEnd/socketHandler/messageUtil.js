@@ -16,15 +16,11 @@ module.exports = (io, socket, users, groupRooms) => {
 
     // Listen for "deleteMessage" event from a client
     socket.on("deleteMessage", (msg) => {
-
-        console.log("Message deleted:");
-
         // Broadcast to ALL clients (except sender)
         socket.broadcast.emit("messageDeleted", msg);
     });
 
     socket.on("editMessage", (msg) => {
-        console.log("Message edited:");
         // Broadcast to ALL clients (except sender)
         socket.broadcast.emit("messageEdited", msg);
     });

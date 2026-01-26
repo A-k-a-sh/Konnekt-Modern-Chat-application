@@ -2,11 +2,6 @@ const { v4: uuidv4 } = require('uuid');
 
 module.exports = (io, socket, users, groupRooms) => {
     socket.on('message', ({ sender, receiver, msg, mediaLinks, reply, time, chatType, groupId ,forwardFrom }) => {
-
-        //sender - who logged in || full obj (see allUserInfo)
-        //receiver - to whom user is chatting || full obj
-
-        console.log(`message from ${sender.userName} to ${receiver.userName} : ${msg}`);
         msgId = uuidv4();
 
 
@@ -28,7 +23,6 @@ module.exports = (io, socket, users, groupRooms) => {
         }
         else {
             io.to(users[sender.userId]).emit('receivedMessage', { msgId, sender, receiver, msg, mediaLinks, reply, time, chatType, groupId,forwardFrom });
-            console.log(`User ${receiver} not online`);
         }
     })
 }

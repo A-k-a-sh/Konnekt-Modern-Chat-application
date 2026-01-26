@@ -241,7 +241,7 @@ export default function ModalSearchGroupOrUser({ modalOpen, setModalOpen, info, 
                                                 <div className='flex items-center gap-3'>
                                                     <div className='w-10 h-10 rounded-full overflow-hidden ring-2 ring-white/10'>
                                                         <img
-                                                            src={user.profilePhoto}
+                                                            src={user.profilePhoto || user.image}
                                                             alt={user.userName}
                                                             className='w-full h-full object-cover'
                                                         />

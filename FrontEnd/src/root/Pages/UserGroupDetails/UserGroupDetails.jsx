@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useAllContext } from '../../../Context/AllContext'
+import { usePanelContext } from '../../../Context/PanelContext'
 import { useLocation } from 'react-router-dom'
 import ModalImageShow from '../../../Modals/ModalImageShow'
 import { downloadFile } from '../../../services'
@@ -8,6 +9,7 @@ import { socket } from '../../../services'
 
 const UserGroupDetails = () => {
     const { selectedUser, setSelectedUser, selectedGroup, setSelectedGroup, userInfo, joined_groupsInfo, connected_to, allGroupsData } = useAllContext()
+    const { closePanel } = usePanelContext()
     const location = useLocation()
     const isGroupChat = location.pathname === '/group'
 
@@ -52,8 +54,9 @@ const UserGroupDetails = () => {
                 onClick={() => {
                     if (viewingMember) setViewingMember(null);
                     else {
-                        setSelectedUser({});
-                        setSelectedGroup({});
+                        // setSelectedUser({});
+                        // setSelectedGroup({});
+                        closePanel();
                     }
                 }}
                 className='absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-black/20 hover:bg-white/10 flex items-center justify-center transition-all cursor-pointer backdrop-blur-sm border border-white/5'
@@ -128,7 +131,7 @@ const UserGroupDetails = () => {
                         <div className='relative mb-4'>
                             <div className='w-24 h-24 rounded-full overflow-hidden ring-4 ring-purple-500/30'>
                                 <img
-                                    src={isGroupChat ? selectedGroup.groupImage : selectedUser.profilePhoto}
+                                    src={isGroupChat ? selectedGroup.groupImage : selectedUser.profilePhoto || selectedUser.image}
                                     alt={isGroupChat ? selectedGroup.groupName : selectedUser.userName}
                                     className='w-full h-full object-cover'
                                 />

@@ -48,6 +48,7 @@ const RightTop = () => {
     ],
     total: 24,
   };
+  
   const { avatars, surplus } = clampAvatars(dataFromTheServer.people, {
     max: 4,
     total: dataFromTheServer.total,
@@ -84,7 +85,7 @@ const RightTop = () => {
 
           <div className='relative'>
             <div className='w-12 h-12 rounded-full overflow-hidden ring-2 ring-white/20 group-hover:ring-purple-500/50 transition-all duration-300'>
-              <img className='w-full h-full object-cover' src={selectedGroup?.groupImage || selectedUser?.profilePhoto} alt="" />
+              <img className='w-full h-full object-cover' src={selectedGroup?.groupImage || selectedUser?.image} alt="" />
             </div>
 
             <div className='absolute -bottom-1 -right-1'>
@@ -112,7 +113,7 @@ const RightTop = () => {
                 </AvatarGroup>
               ) : (
                 <p className='text-xs text-gray-400'>
-                  {isOnline ? '🟢 Online' : '⚫ Offline'}
+                  {isOnline ? 'Online' : 'Offline'}
 
                 </p>
               )

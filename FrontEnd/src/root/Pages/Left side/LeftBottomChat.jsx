@@ -6,11 +6,19 @@ import './Left.css'
 import { useRightContext } from '../Right Side/Right Context/RightContext'
 import ModalUserSkeleton from '../../../Modals/ModalUserSkeleton'
 
+import { useIsOnline } from '../../../hooks'
+
+
 const LeftBottomChat = () => {
     const src = 'https://www.shutterstock.com/image-photo/awesome-pic-natureza-600nw-2408133899.jpg'
 
 
     const { selectedUser, setSelectedUser, setSelectedGroup, connected_to, userInfo } = useAllContext()
+
+    const [isOnline, setIsOnline] = useState(false)
+    useIsOnline(selectedUser, userInfo, setIsOnline)
+
+
 
     const [showSkeleton, setShowSkeleton] = useState(true)
 
@@ -59,7 +67,11 @@ const LeftBottomChat = () => {
                                             />
                                         </div>
                                         {/* Online status indicator */}
-                                        <div className='absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-[#1a1a2e] animate-pulse'></div>
+                                        {isOnline ? (
+                                            <div className='absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full'></div>
+                                        ) : (
+                                            <div className='absolute bottom-0 right-0 w-3 h-3 bg-gray-500 rounded-full'></div>
+                                        )}
                                     </div>
 
                                     {/* User info */}

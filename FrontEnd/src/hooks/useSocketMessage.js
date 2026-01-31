@@ -7,14 +7,14 @@ export const useSocketMessage = (setAllMessages) => {
             try {
                 const { msgId, sender, receiver, msg, mediaLinks, reply, time, chatType, groupId, forwardFrom } = messageData;
 
-                // Validate required fields
-                if (!msgId || !sender || !msg) {
+                // Validate required fields (msg can be empty if there are media)
+                if (!msgId || !sender) {
                     console.error('Invalid message data received:', messageData);
                     return;
                 }
 
                 // Browser notification with error handling
-                if ("Notification" in window) {
+                if ("Notification" in window && msg) {
                     try {
                         if (Notification.permission === "granted") {
                             const notification = new Notification(sender.userName + " : " + msg, {
@@ -49,7 +49,7 @@ export const useSocketMessage = (setAllMessages) => {
                         msgId: msgId,
                         sender: sender,
                         receiver: receiver,
-                        message: msg,
+                        msg: msg,
                         mediaLinks: mediaLinks || [],
                         reply: reply || null,
                         time: time,

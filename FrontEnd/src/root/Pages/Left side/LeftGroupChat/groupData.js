@@ -1,7 +1,10 @@
+/**
+ * DEPRECATED - DO NOT USE
+ * This file is no longer used. All group data now comes from MongoDB via /api/groups
+ * Kept for reference only. Can be safely deleted.
+ */
 
-
-
-  export const allGroupsData = [
+export const allGroupsData = [
     {
         groupId : 'sklCImmsdi',
         groupName : "Group 1",

@@ -6,10 +6,7 @@ import Typography from '@mui/joy/Typography';
 import Sheet from '@mui/joy/Sheet';
 import { useAllContext } from '../Context/AllContext';
 import { useEffect, useState } from 'react';
-import io from 'socket.io-client';
-
-
-const socket = io('http://localhost:4000');
+import { socket } from '../services/socket.service';
 
 
 export default function ModalSearchGroupOrUser({ modalOpen, setModalOpen, info, name }) {
@@ -83,6 +80,8 @@ export default function ModalSearchGroupOrUser({ modalOpen, setModalOpen, info, 
     const wantToJoin = (grp) => {
         const userId = userInfo.userId
 
+        console.log('[ModalSearchGroupOrUser] Sending join request:', { groupId: grp.groupId, userId });
+
         // Update local state
         setAllGroupsData((prev) => prev.map((g) => {
             if (g.groupId === grp.groupId) {
@@ -93,10 +92,13 @@ export default function ModalSearchGroupOrUser({ modalOpen, setModalOpen, info, 
 
         // Emit socket event for backend persistence
         socket.emit('groupJoinRequest', { groupId: grp.groupId, userId });
+        console.log('[ModalSearchGroupOrUser] Join request emitted');
     }
 
     const cancelJoinRequest = (grp) => {
         const userId = userInfo.userId
+
+        console.log('[ModalSearchGroupOrUser] Canceling join request:', { groupId: grp.groupId, userId });
 
         // Update local state
         setAllGroupsData((prev) => prev.map((g) => {
@@ -112,33 +114,10 @@ export default function ModalSearchGroupOrUser({ modalOpen, setModalOpen, info, 
 
         // Emit socket event for backend persistence
         socket.emit('cancelJoinRequest', { groupId: grp.groupId, userId });
+        console.log('[ModalSearchGroupOrUser] Cancel request emitted');
     }
 
-    // Listen for join request updates
-    useEffect(() => {
-        socket.on('groupJoinRequestUpdate', ({ groupId, joinRequests }) => {
-            setAllGroupsData((prev) => prev.map((g) => {
-                if (g.groupId === groupId) {
-                    return { ...g, groupJoinRequests: joinRequests };
-                }
-                return g;
-            }));
-        });
-
-        socket.on('groupMemberUpdate', ({ groupId, members, joinRequests }) => {
-            setAllGroupsData((prev) => prev.map((g) => {
-                if (g.groupId === groupId) {
-                    return { ...g, groupMembers: members, groupJoinRequests: joinRequests };
-                }
-                return g;
-            }));
-        });
-
-        return () => {
-            socket.off('groupJoinRequestUpdate');
-            socket.off('groupMemberUpdate');
-        };
-    }, []);
+    // Socket listeners for join requests are handled by useGroupJoinRequests hook in AllContext
 
 
 

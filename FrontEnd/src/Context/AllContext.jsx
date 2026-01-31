@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { socket } from '../services/socket.service';
+import { useGroupJoinRequests, useUserConnection } from '../hooks';
 
 const hydrateGroups = (groups, users) => {
     if (!groups || !users) return [];
@@ -90,6 +91,70 @@ const AllContext = ({ children }) => {
             socket.off('getLoggedInUserInfo', handleGetLoggedInUserInfo);
         };
     }, [userInfo?.userId]);
+
+    // Handle group join requests real-time updates
+    useGroupJoinRequests(setAllGroupsData, setJoined_groupsInfo, userInfo, setUserInfo, selectedGroup, setSelectedGroup);
+
+    // Handle auto-connection when users message each other
+    useUserConnection(setConnected_to);
+
+    // Handle group updates
+    useEffect(() => {
+        const handleGroupUpdated = ({ groupId, updates }) => {
+            console.log('[Group Updated] Updating group in UI:', groupId, updates);
+            
+            // Update in allGroupsData
+            setAllGroupsData(prev => (prev || []).map(g => 
+                g.groupId === groupId ? { ...g, ...updates } : g
+            ));
+            
+            // Update in joined_groupsInfo
+            setJoined_groupsInfo(prev => (prev || []).map(g => 
+                g.groupId === groupId ? { ...g, ...updates } : g
+            ));
+            
+            // Update selectedGroup if it's the updated one
+            setSelectedGroup(prev => {
+                if (prev?.groupId === groupId) {
+                    return { ...prev, ...updates };
+                }
+                return prev || {};
+            });
+        };
+
+        socket.on('groupUpdated', handleGroupUpdated);
+
+        return () => {
+            socket.off('groupUpdated', handleGroupUpdated);
+        };
+    }, []);
+
+    // Handle group deletion
+    useEffect(() => {
+        const handleGroupDeleted = ({ groupId, groupName }) => {
+            console.log('[Group Deleted] Removing group from UI:', groupId, groupName);
+            
+            // Remove from allGroupsData
+            setAllGroupsData(prev => (prev || []).filter(g => g.groupId !== groupId));
+            
+            // Remove from joined_groupsInfo
+            setJoined_groupsInfo(prev => (prev || []).filter(g => g.groupId !== groupId));
+            
+            // Clear selectedGroup if it's the deleted one
+            setSelectedGroup(prev => {
+                if (prev?.groupId === groupId) {
+                    return {};
+                }
+                return prev || {};
+            });
+        };
+
+        socket.on('groupDeleted', handleGroupDeleted);
+
+        return () => {
+            socket.off('groupDeleted', handleGroupDeleted);
+        };
+    }, []);
 
     const [mediaUploading, setMediaUploading] = useState(false)
 

@@ -6,7 +6,7 @@ import InputArea from '../input/TextArea'
 import './Right.css'
 import ModalSelectUser from '../input/ModalSelectUser'
 
-import { useSocketMessage } from '../../../hooks'
+import { useSocketMessage, useMessageHistory } from '../../../hooks'
 import Chats from './Chats'
 import ModalImageShow from '../../../Modals/ModalImageShow'
 
@@ -29,21 +29,51 @@ const Right = () => {
     const { selectedUser, userInfo: curUserInfo, selectedGroup, allMessages, setAllMessages } = useAllContext()
     const { setSelectedMsg, setIsMsgSelected } = useRightContext()
 
+    // Reset background to default gradient when switching chats
+    useEffect(() => {
+        if (MsgAreaDivRef.current) {
+            MsgAreaDivRef.current.style.backgroundImage = '';
+            MsgAreaDivRef.current.style.backgroundPosition = '';
+            MsgAreaDivRef.current.style.backgroundSize = '';
+            MsgAreaDivRef.current.style.backgroundRepeat = '';
+        }
+    }, [selectedUser?.userId, selectedGroup?.groupId]);
+
     useEffect(() => {
         setSelectedMsg([])
         setIsMsgSelected(false)
     }, [selectedGroup, selectedUser])
 
     useSocketMessage(setAllMessages)
+    
+    // Load message history from database when selecting a chat
+    useMessageHistory({ 
+        selectedUser, 
+        selectedGroup, 
+        userInfo: curUserInfo, 
+        setAllMessages, 
+        allMessages 
+    });
 
     // Filter messages based on selected user or group
     const filteredMessages = useMemo(() => {
-        return allMessages.filter((msg) =>
-            (msg.chatType === 'private' && (msg.receiver.userId === selectedUser.userId && msg.sender.userId === curUserInfo.userId) ||
-                (msg.sender.userId === selectedUser.userId && msg.receiver.userId === curUserInfo.userId)) ||
-
-            (msg.chatType === 'group' && (msg.groupId === selectedGroup.groupId))
-        )
+        if (!curUserInfo?.userId) return [];
+        
+        return allMessages.filter((msg) => {
+            // Group chat
+            if (msg.chatType === 'group' && selectedGroup?.groupId) {
+                return msg.groupId === selectedGroup.groupId;
+            }
+            
+            // Private chat
+            if (msg.chatType === 'private' && selectedUser?.userId) {
+                const isReceiverMatch = msg.receiver?.userId === selectedUser.userId && msg.sender?.userId === curUserInfo.userId;
+                const isSenderMatch = msg.sender?.userId === selectedUser.userId && msg.receiver?.userId === curUserInfo.userId;
+                return isReceiverMatch || isSenderMatch;
+            }
+            
+            return false;
+        });
     }, [allMessages, selectedUser, selectedGroup, curUserInfo])
 
     const showMediaFunction = (src, type) => {

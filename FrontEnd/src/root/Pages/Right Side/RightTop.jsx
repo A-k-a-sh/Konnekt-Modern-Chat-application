@@ -27,34 +27,6 @@ function clampAvatars(avatars, options = { max: 5 }) {
 
 const RightTop = () => {
 
-  const dataFromTheServer = {
-    people: [
-      {
-        alt: 'R',
-        src: '/static/images/avatar/1.jpg',
-      },
-      {
-        alt: 'Travis Howard',
-        src: '/static/images/avatar/2.jpg',
-      },
-      {
-        alt: 'Agnes Walker',
-        src: '/static/images/avatar/4.jpg',
-      },
-      {
-        alt: 'Trevor Henderson',
-        src: '/static/images/avatar/5.jpg',
-      },
-    ],
-    total: 24,
-  };
-  
-  const { avatars, surplus } = clampAvatars(dataFromTheServer.people, {
-    max: 4,
-    total: dataFromTheServer.total,
-  });
-
-
   const { selectedUser, selectedGroup, userInfo: info } = useAllContext()
   const { togglePanel } = usePanelContext()
   const { isMsgSelected, selectedMsg, setSelectedMsg, setIsMsgSelected } = useRightContext()
@@ -66,6 +38,23 @@ const RightTop = () => {
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [forwardMsgModalOpen, setForwardMsgModalOpen] = useState(false)
+
+  // Get real group member avatars
+  const getGroupAvatars = () => {
+    if (!selectedGroup?.groupMembers) return { avatars: [], surplus: 0 };
+    
+    const members = selectedGroup.groupMembers.map(member => ({
+      alt: member.userName || 'User',
+      src: member.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.userName || 'User')}&background=random&size=32`,
+    }));
+    
+    return clampAvatars(members, {
+      max: 4,
+      total: selectedGroup.groupMembers.length,
+    });
+  };
+
+  const { avatars, surplus } = getGroupAvatars();
 
 
   const handleForward = () => {
@@ -85,7 +74,17 @@ const RightTop = () => {
 
           <div className='relative'>
             <div className='w-12 h-12 rounded-full overflow-hidden ring-2 ring-white/20 group-hover:ring-purple-500/50 transition-all duration-300'>
-              <img className='w-full h-full object-cover' src={selectedGroup?.groupImage || selectedUser?.image} alt="" />
+              <img 
+                className='w-full h-full object-cover' 
+                src={
+                  selectedGroup?.groupImage 
+                    ? selectedGroup.groupImage 
+                    : selectedGroup?.groupName 
+                      ? `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedGroup.groupName)}&background=random`
+                      : selectedUser?.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedUser?.userName || 'User')}&background=random`
+                } 
+                alt="" 
+              />
             </div>
 
             <div className='absolute -bottom-1 -right-1'>
@@ -98,23 +97,30 @@ const RightTop = () => {
 
 
             {
-              selectedGroup?.groupMembers ? (
-                <AvatarGroup
-                  color='neutral'
-                  variant='soft'
-                  size='sm'
-
-                // className='flex flex-row gap-1 borde  '
-                >
-                  {avatars.map((avatar) => (
-                    <Avatar key={avatar.alt} {...avatar} > {avatar.alt[0]} </Avatar>
+              selectedGroup?.groupMembers && avatars.length > 0 ? (
+                <div className='flex items-center -space-x-2'>
+                  {avatars.map((avatar, index) => (
+                    <img 
+                      key={index}
+                      src={avatar.src} 
+                      alt={avatar.alt}
+                      className='w-6 h-6 rounded-full border-2 border-[#1a1a2e] object-cover'
+                      title={avatar.alt}
+                    />
                   ))}
-                  {!!surplus && <Avatar size='sm'>+{surplus}</Avatar>}
-                </AvatarGroup>
+                  {!!surplus && (
+                    <div className='w-6 h-6 rounded-full bg-purple-600 border-2 border-[#1a1a2e] flex items-center justify-center text-white text-xs font-medium'>
+                      +{surplus}
+                    </div>
+                  )}
+                </div>
+              ) : selectedGroup?.groupMembers ? (
+                <p className='text-xs text-gray-400'>
+                  {selectedGroup.groupMembers.length} members
+                </p>
               ) : (
                 <p className='text-xs text-gray-400'>
                   {isOnline ? 'Online' : 'Offline'}
-
                 </p>
               )
             }

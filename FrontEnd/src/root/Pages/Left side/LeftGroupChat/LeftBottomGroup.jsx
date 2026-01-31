@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react'
 
-import { allGroupsData } from './groupData';
-
 import ModalAddNewGroup from '../../../../Modals/ModalAddNewGroup'
 
 import { useAllContext } from '../../../../Context/AllContext';
@@ -49,7 +47,7 @@ const LeftBottomGroup = () => {
                     <div className='w-12 h-12 rounded-full overflow-hidden ring-2 ring-white/10 group-hover:ring-purple-500/50 transition-all duration-300'>
                       <img
                         className='w-full h-full object-cover'
-                        src={group.groupImage}
+                        src={group.groupImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(group.groupName || 'Group')}&background=random`}
                         alt={group.groupName}
                       />
                     </div>

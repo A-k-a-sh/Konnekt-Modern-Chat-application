@@ -23,6 +23,10 @@ export const APP_CONSTANTS = {
         JOIN_REQUEST_REJECTED: 'joinRequestRejected',
         JOIN_REQUEST_SENT: 'joinRequestSent',
         JOIN_REQUEST_CANCELED: 'joinRequestCanceled',
+        LEAVE_GROUP: 'leaveGroup',
+        LEFT_GROUP: 'leftGroup',
+        REMOVE_MEMBER: 'removeMember',
+        REMOVED_FROM_GROUP: 'removedFromGroup',
     },
 
     CHAT_TYPES: {

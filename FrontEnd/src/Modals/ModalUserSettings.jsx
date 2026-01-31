@@ -125,6 +125,25 @@ export default function ModalUserSettings({ modalOpen, setModalOpen, MsgAreaDivR
                             </div>
 
                             <p className='text-center text-xl text-zinc-500 underline'>Change Background</p>
+                            
+                            {/* Reset to default gradient button */}
+                            <div className='w-full mt-2 flex justify-center'>
+                                <Button
+                                    onClick={() => {
+                                        if (MsgAreaDivRef.current) {
+                                            MsgAreaDivRef.current.style.backgroundImage = ''
+                                            MsgAreaDivRef.current.style.backgroundPosition = ''
+                                            MsgAreaDivRef.current.style.backgroundSize = ''
+                                            MsgAreaDivRef.current.style.backgroundRepeat = ''
+                                        }
+                                    }}
+                                    variant='soft'
+                                    color='neutral'
+                                >
+                                    Reset to Default Gradient
+                                </Button>
+                            </div>
+
                             <div className='w-full mt-2 p-2 rounded-md flex flex-row flex-wrap justify-start items-center bg-neutral-800 gap-3 '>
                                 {/* // change background image */}
                                 {
@@ -133,14 +152,12 @@ export default function ModalUserSettings({ modalOpen, setModalOpen, MsgAreaDivR
                                             key={index}
                                             className='cursor-pointer loading-lazy'
                                             onClick={() => {
-                                                MsgAreaDivRef.current.style.backgroundImage = `url(${src})`
-
-                                                MsgAreaDivRef.current.style.backgroundPosition = 'center'
-
-                                                MsgAreaDivRef.current.style.backgroundSize = 'cover'
-
-                                                MsgAreaDivRef.current.style.backgroundRepeat = 'no-repeat'
-
+                                                if (MsgAreaDivRef.current) {
+                                                    MsgAreaDivRef.current.style.backgroundImage = `url(${src})`
+                                                    MsgAreaDivRef.current.style.backgroundPosition = 'center'
+                                                    MsgAreaDivRef.current.style.backgroundSize = 'cover'
+                                                    MsgAreaDivRef.current.style.backgroundRepeat = 'no-repeat'
+                                                }
                                             }}
                                         >
                                             <img className='w-20 h-20 loading-lazy mx-auto rounded-full object-cover object-center ' src={src} alt="" />

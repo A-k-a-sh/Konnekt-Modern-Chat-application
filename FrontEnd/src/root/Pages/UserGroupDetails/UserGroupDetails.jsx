@@ -3,6 +3,9 @@ import { useAllContext } from '../../../Context/AllContext'
 import { usePanelContext } from '../../../Context/PanelContext'
 import { useLocation } from 'react-router-dom'
 import ModalImageShow from '../../../Modals/ModalImageShow'
+import ModalConfirm from '../../../Modals/ModalConfirm'
+import ModalAddMembers from '../../../Modals/ModalAddMembers'
+import ModalEditGroup from '../../../Modals/ModalEditGroup'
 import { downloadFile } from '../../../services'
 import { useIsOnline } from '../../../hooks'
 import { socket } from '../../../services'
@@ -18,6 +21,14 @@ const UserGroupDetails = () => {
     const [viewingMember, setViewingMember] = useState(null) // To store the member being viewed
     const [selectedMedia, setSelectedMedia] = useState({ src: '', type: '' })
     const [allMediaForModal, setAllMediaForModal] = useState([])
+    
+    // Confirmation modal states
+    const [showLeaveConfirm, setShowLeaveConfirm] = useState(false)
+    const [showRemoveConfirm, setShowRemoveConfirm] = useState(false)
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+    const [showAddMembersModal, setShowAddMembersModal] = useState(false)
+    const [showEditGroupModal, setShowEditGroupModal] = useState(false)
+    const [memberToRemove, setMemberToRemove] = useState(null)
 
     // Use local isOnline state with useIsOnline hook for proper tracking
     const [isOnline, setIsOnline] = useState(false)
@@ -131,7 +142,11 @@ const UserGroupDetails = () => {
                         <div className='relative mb-4'>
                             <div className='w-24 h-24 rounded-full overflow-hidden ring-4 ring-purple-500/30'>
                                 <img
-                                    src={isGroupChat ? selectedGroup.groupImage : selectedUser.profilePhoto || selectedUser.image}
+                                    src={
+                                        isGroupChat 
+                                            ? (selectedGroup.groupImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedGroup.groupName || 'Group')}&background=random&size=96`)
+                                            : (selectedUser.profilePhoto || selectedUser.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedUser.userName || 'User')}&background=random&size=96`)
+                                    }
                                     alt={isGroupChat ? selectedGroup.groupName : selectedUser.userName}
                                     className='w-full h-full object-cover'
                                 />
@@ -157,7 +172,8 @@ const UserGroupDetails = () => {
                     </div>
 
                     {/* Tabs */}
-                    <div className='flex border-b border-white/10 bg-white/5'>
+                    <div className='flex border-b border-white/10 bg-white/5 overflow-x-auto [scrollbar-width:none]
+[&::-webkit-scrollbar]:hidden '>
                         <button
                             onClick={() => setActiveTab('about')}
                             className={`flex-1 py-3 px-4 text-sm font-medium transition-all duration-200 ${activeTab === 'about'
@@ -271,6 +287,7 @@ const UserGroupDetails = () => {
                                 {/* Members Section (for groups) */}
                                 {isGroupChat && selectedGroup.members && (
                                     <div className='bg-white/5 rounded-xl p-4 border border-white/10'>
+                                        
                                         <h3 className='text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2'>
                                             <i className="fa-solid fa-users text-blue-400"></i>
                                             Members ({selectedGroup.members.length})
@@ -322,10 +339,48 @@ const UserGroupDetails = () => {
                                     )}
 
                                     {isGroupChat && (
-                                        <button className='w-full flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-red-500/30 transition-all duration-200 group'>
-                                            <i className="fa-solid fa-right-from-bracket text-red-400 group-hover:text-red-300"></i>
-                                            <span className='text-sm text-white'>Leave group</span>
-                                        </button>
+                                        <>
+                                            {/* Edit Group Button - Only for Admin */}
+                                            {currentGroup.adminId === userInfo?.userId && (
+                                                <button 
+                                                    onClick={() => setShowEditGroupModal(true)}
+                                                    className='w-full flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-blue-500/30 transition-all duration-200 group'
+                                                >
+                                                    <i className="fa-solid fa-edit text-blue-400 group-hover:text-blue-300"></i>
+                                                    <span className='text-sm text-white'>Edit group info</span>
+                                                </button>
+                                            )}
+
+                                            {/* Add Members Button - Only for Admin */}
+                                            {currentGroup.adminId === userInfo?.userId && (
+                                                <button 
+                                                    onClick={() => setShowAddMembersModal(true)}
+                                                    className='w-full flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-green-500/30 transition-all duration-200 group'
+                                                >
+                                                    <i className="fa-solid fa-user-plus text-green-400 group-hover:text-green-300"></i>
+                                                    <span className='text-sm text-white'>Add members</span>
+                                                </button>
+                                            )}
+
+                                            <button 
+                                                onClick={() => setShowLeaveConfirm(true)}
+                                                className='w-full flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-red-500/30 transition-all duration-200 group'
+                                            >
+                                                <i className="fa-solid fa-right-from-bracket text-red-400 group-hover:text-red-300"></i>
+                                                <span className='text-sm text-white'>Leave group</span>
+                                            </button>
+
+                                            {/* Delete Group Button - Only for Admin */}
+                                            {currentGroup.adminId === userInfo?.userId && (
+                                                <button 
+                                                    onClick={() => setShowDeleteConfirm(true)}
+                                                    className='w-full flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-red-600/50 transition-all duration-200 group'
+                                                >
+                                                    <i className="fa-solid fa-trash text-red-500 group-hover:text-red-400"></i>
+                                                    <span className='text-sm text-white'>Delete group</span>
+                                                </button>
+                                            )}
+                                        </>
                                     )}
                                 </div>
                             </div>
@@ -523,31 +578,54 @@ const UserGroupDetails = () => {
                         {activeTab === 'members' && isGroupChat && (
                             <div className='space-y-4'>
                                 <div className='space-y-2'>
-                                    {currentGroup.groupMembers?.map((member, index) => (
+                                    {currentGroup.groupMembers?.map((member) => (
                                         <div
-                                            key={index}
-                                            onClick={() => setViewingMember(member)}
-                                            className='flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10 hover:border-purple-500/30 hover:bg-white/10 cursor-pointer transition-all duration-200 group'
+                                            key={member.userId}
+                                            className='flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10 hover:border-purple-500/30 transition-all duration-200 group'
                                         >
-                                            <div className='w-10 h-10 rounded-full overflow-hidden ring-2 ring-white/10 group-hover:ring-purple-500/50 transition-all'>
-                                                <img
-                                                    src={member.profilePhoto || member.image}
-                                                    alt={member.userName}
-                                                    className='w-full h-full object-cover'
-                                                />
-                                            </div>
-                                            <div className='flex-1 min-w-0 text-left'>
-                                                <div className='flex items-center gap-2'>
-                                                    <p className='text-sm text-white font-medium truncate group-hover:text-purple-300 transition-colors'>
-                                                        {member.userName}
-                                                    </p>
-                                                    {currentGroup.adminId === member.userId && (
-                                                        <i className="fa-solid fa-crown text-yellow-500 text-xs" title="Admin"></i>
-                                                    )}
+                                            <div 
+                                                onClick={() => setViewingMember(member)}
+                                                className='flex items-center gap-3 flex-1 cursor-pointer'
+                                            >
+                                                <div className='w-10 h-10 rounded-full overflow-hidden ring-2 ring-white/10 group-hover:ring-purple-500/50 transition-all'>
+                                                    <img
+                                                        src={member.profilePhoto || member.image}
+                                                        alt={member.userName}
+                                                        className='w-full h-full object-cover'
+                                                    />
                                                 </div>
-                                                <p className='text-xs text-gray-400'>View Profile</p>
+                                                <div className='flex-1 min-w-0 text-left'>
+                                                    <div className='flex items-center gap-2'>
+                                                        <p className='text-sm text-white font-medium truncate group-hover:text-purple-300 transition-colors'>
+                                                            {member.userName}
+                                                            {member.userId === userInfo.userId && ' (You)'}
+                                                        </p>
+                                                        {currentGroup.adminId === member.userId && (
+                                                            <i className="fa-solid fa-crown text-yellow-500 text-xs" title="Admin"></i>
+                                                        )}
+                                                    </div>
+                                                    <p className='text-xs text-gray-400'>View Profile</p>
+                                                </div>
+                                                <i className="fa-solid fa-chevron-right text-gray-500 group-hover:text-purple-400 opacity-0 group-hover:opacity-100 transition-all"></i>
                                             </div>
-                                            <i className="fa-solid fa-chevron-right text-gray-500 group-hover:text-purple-400 opacity-0 group-hover:opacity-100 transition-all"></i>
+
+                                            {/* Remove button (admin only, can't remove self or other admin) */}
+                                            {currentGroup.adminId === userInfo.userId && 
+                                             member.userId !== userInfo.userId && 
+                                             member.userId !== currentGroup.adminId && (
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setMemberToRemove(member);
+                                                        setShowRemoveConfirm(true);
+                                                    }}
+                                                    className='px-3 py-1.5 rounded-lg bg-red-600/20 hover:bg-red-600/30 border border-red-500/30 hover:border-red-500/50 text-red-400 hover:text-red-300 text-xs transition-all duration-200 flex items-center gap-1'
+                                                    title="Remove member"
+                                                >
+                                                    <i className="fa-solid fa-user-minus"></i>
+                                                    <span>Remove</span>
+                                                </button>
+                                            )}
                                         </div>
                                     ))}
                                 </div>
@@ -573,6 +651,12 @@ const UserGroupDetails = () => {
                                     }
 
                                     const handleApprove = (userId) => {
+                                        console.log('[Frontend] Approving request:', {
+                                            groupId: currentGroup.groupId,
+                                            userId: userId,
+                                            adminId: userInfo.userId,
+                                            currentGroupAdminId: currentGroup.adminId
+                                        });
                                         socket.emit('approveJoinRequest', {
                                             groupId: currentGroup.groupId,
                                             userId: userId,
@@ -581,6 +665,12 @@ const UserGroupDetails = () => {
                                     };
 
                                     const handleReject = (userId) => {
+                                        console.log('[Frontend] Rejecting request:', {
+                                            groupId: currentGroup.groupId,
+                                            userId: userId,
+                                            adminId: userInfo.userId,
+                                            currentGroupAdminId: currentGroup.adminId
+                                        });
                                         socket.emit('rejectJoinRequest', {
                                             groupId: currentGroup.groupId,
                                             userId: userId,
@@ -590,9 +680,9 @@ const UserGroupDetails = () => {
 
                                     return (
                                         <div className='space-y-2'>
-                                            {joinRequests.map((request, index) => (
+                                            {joinRequests.map((request) => (
                                                 <div
-                                                    key={index}
+                                                    key={request.userId}
                                                     className='flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/10 hover:border-purple-500/30 transition-all duration-200'
                                                 >
                                                     <div className='flex items-center gap-3'>
@@ -643,6 +733,105 @@ const UserGroupDetails = () => {
                         setModalOpen={setShowMediaModal}
                         fileSrcType={selectedMedia}
                         allMedia={allMediaForModal}
+                    />
+
+                    {/* Leave Group Confirmation Modal */}
+                    <ModalConfirm
+                        isOpen={showLeaveConfirm}
+                        onClose={() => setShowLeaveConfirm(false)}
+                        onConfirm={() => {
+                            console.log('[Leave Group] User leaving group:', {
+                                groupId: currentGroup.groupId,
+                                userId: userInfo.userId,
+                                socketConnected: socket.connected
+                            });
+                            console.log('[Leave Group] Emitting leaveGroup event...');
+                            socket.emit('leaveGroup', {
+                                groupId: currentGroup.groupId,
+                                userId: userInfo.userId
+                            });
+                            console.log('[Leave Group] Event emitted successfully');
+                            closePanel();
+                        }}
+                        title="Leave Group"
+                        message={`Are you sure you want to leave ${currentGroup.groupName}? You'll need to request to join again.`}
+                        confirmText="Leave"
+                        cancelText="Cancel"
+                        type="danger"
+                    />
+
+                    {/* Remove Member Confirmation Modal */}
+                    <ModalConfirm
+                        isOpen={showRemoveConfirm}
+                        onClose={() => {
+                            setShowRemoveConfirm(false);
+                            setMemberToRemove(null);
+                        }}
+                        onConfirm={() => {
+                            if (memberToRemove) {
+                                console.log('[Remove Member] Admin removing member:', {
+                                    groupId: currentGroup.groupId,
+                                    userId: memberToRemove.userId,
+                                    adminId: userInfo.userId,
+                                    socketConnected: socket.connected
+                                });
+                                console.log('[Remove Member] Emitting removeMember event...');
+                                socket.emit('removeMember', {
+                                    groupId: currentGroup.groupId,
+                                    userId: memberToRemove.userId,
+                                    adminId: userInfo.userId
+                                });
+                                console.log('[Remove Member] Event emitted successfully');
+                                setMemberToRemove(null);
+                            }
+                        }}
+                        title="Remove Member"
+                        message={memberToRemove ? `Remove ${memberToRemove.userName} from ${currentGroup.groupName}? They can request to join again later.` : ''}
+                        confirmText="Remove"
+                        cancelText="Cancel"
+                        type="danger"
+                    />
+
+                    {/* Delete Group Confirmation Modal - Admin Only */}
+                    <ModalConfirm
+                        isOpen={showDeleteConfirm}
+                        onClose={() => setShowDeleteConfirm(false)}
+                        onConfirm={() => {
+                            console.log('[Delete Group] Admin deleting group:', {
+                                groupId: currentGroup.groupId,
+                                groupName: currentGroup.groupName,
+                                adminId: userInfo.userId,
+                                socketConnected: socket.connected
+                            });
+                            console.log('[Delete Group] Emitting deleteGroup event...');
+                            socket.emit('deleteGroup', {
+                                groupId: currentGroup.groupId,
+                                adminId: userInfo.userId
+                            });
+                            console.log('[Delete Group] Event emitted successfully');
+                            setShowDeleteConfirm(false);
+                            setSelectedGroup({});
+                            closePanel();
+                        }}
+                        title="Delete Group"
+                        message={`Are you sure you want to permanently delete ${currentGroup.groupName}? This action cannot be undone. All members will be removed and all messages will be deleted.`}
+                        confirmText="Delete Permanently"
+                        cancelText="Cancel"
+                        type="danger"
+                    />
+
+                    {/* Add Members Modal - Admin Only */}
+                    <ModalAddMembers
+                        isOpen={showAddMembersModal}
+                        onClose={() => setShowAddMembersModal(false)}
+                        currentGroup={currentGroup}
+                    />
+
+                    {/* Edit Group Modal - Admin Only */}
+                    <ModalEditGroup
+                        isOpen={showEditGroupModal}
+                        onClose={() => setShowEditGroupModal(false)}
+                        currentGroup={currentGroup}
                     />
 
                 </div>

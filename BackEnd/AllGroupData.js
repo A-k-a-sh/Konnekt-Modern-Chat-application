@@ -1,3 +1,9 @@
+/**
+ * LEGACY DUMMY DATA FILE
+ * ⚠️ This file is ONLY used by scripts/seedDatabase.js for initial database seeding
+ * ⚠️ DO NOT import this file in socket handlers, routes, or controllers
+ * ⚠️ All app logic should use MongoDB models instead
+ */
 
 const allGroupsData = [
     {

@@ -136,6 +136,8 @@ const Chats = ({ messages, setAllMessages, curUserInfo, showMediaFunction, setMs
 
 
     function linkify(text) {
+        if (!text || typeof text !== 'string') return '';
+        
         const urlRegex = /(https?:\/\/[^\s]+)/g;
 
         return text.split(urlRegex).map((part, index) => {
@@ -195,8 +197,8 @@ const Chats = ({ messages, setAllMessages, curUserInfo, showMediaFunction, setMs
                         {/* MSg showing div : text , media */}
                         <div
                             className={`msgggsgsdf borde relative max-w-full min-w-[5rem] min-h-[2rem] whitspace-pre-wrap break-words text-lg
-                                    ${msg.sender.userId === curUserInfo.userId ? `${msg.mediaLinks && !msg.message ? "text-zinc-200" : "text-white px-2 pb-4 py-1 bg-gradient-to-br from-purple-600 to-blue-600 shadow-lg shadow-purple-500/20 msg-tail-right"}` :
-                                    `${msg.mediaLinks && !msg.message ? "text-zinc-700" : "text-zinc-200 px-2 pb-4 py-1 bg-white/10 backdrop-blur-md border border-white/10 msg-tail-left"}`}
+                                    ${msg.sender.userId === curUserInfo.userId ? `${msg.mediaLinks && !msg.msg ? "text-zinc-200" : "text-white px-2 pb-4 py-1 bg-gradient-to-br from-purple-600 to-blue-600 shadow-lg shadow-purple-500/20 msg-tail-right"}` :
+                                    `${msg.mediaLinks && !msg.msg ? "text-zinc-700" : "text-zinc-200 px-2 pb-4 py-1 bg-white/10 backdrop-blur-md border border-white/10 msg-tail-left"}`}
                                       rounded-2xl`
                             }
                         >
@@ -319,7 +321,7 @@ const Chats = ({ messages, setAllMessages, curUserInfo, showMediaFunction, setMs
                             )}
 
                             {/* //main Message div */}
-                            <p>{linkify(msg.message)}</p>
+                            <p>{linkify(msg.msg)}</p>
 
                             {/* //url Preview div */}
                             {previews && (

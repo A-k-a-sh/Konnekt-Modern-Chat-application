@@ -4,3 +4,6 @@ export { useChangeMessage } from './useChangeMessage';
 export { useIsOnline } from './useIsOnline';
 export { useSelectedMessageDelete } from './useSelectedMessageDelete';
 export { useClickOutside } from './useClickOutside';
+export { useGroupJoinRequests } from './useGroupJoinRequests';
+export { useMessageHistory } from './useMessageHistory';
+export { useUserConnection } from './useUserConnection';

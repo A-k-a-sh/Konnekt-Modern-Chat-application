@@ -4,6 +4,9 @@ import { Link, NavLink } from 'react-router-dom'
 
 import { useAllContext } from '../../../Context/AllContext';
 import ModalSearchGroupOrUser from '../../../Modals/ModalSearchGroupOrUser';
+import ModalAddNewGroup from '../../../Modals/ModalAddNewGroup';
+import NotificationBell from '../../../Components/Notification/NotificationBell';
+import { useNotificationSocket } from '../../../hooks/useNotificationSocket';
 
 import { useLocation } from 'react-router-dom';
 
@@ -14,10 +17,14 @@ const LeftSideBar = () => {
     isActive ? 'bg-primary-500 rounded-lg ' : '';
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [createGroupModalOpen, setCreateGroupModalOpen] = useState(false);
 
   const [info, setInfo] = useState({})
   const location = useLocation();
   const pathName = location.pathname;
+
+  // Initialize notification socket listeners
+  useNotificationSocket();
 
 
   return (
@@ -65,7 +72,8 @@ const LeftSideBar = () => {
               Groups
             </span>
           </NavLink>
-
+          {/* Notification Bell */}
+          <NotificationBell />
         </div>
 
         {/* Divider */}
@@ -94,22 +102,35 @@ const LeftSideBar = () => {
         {/* Add New Button (Floating at bottom) */}
         <div className='mt-auto mb-4 px-2'>
           <button
-            onClick={() => setModalOpen(true)}
+            onClick={() => {
+              // Open create group modal when on group route, otherwise open search modal
+              if (pathName === '/group') {
+                setCreateGroupModalOpen(true);
+              } else {
+                setModalOpen(true);
+              }
+            }}
             className='w-full py-2 px-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 rounded-lg transition-all duration-300 shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 hover:scale-105 flex items-center justify-center gap-2 group'
           >
             <i className="fa-solid fa-plus text-sm group-hover:rotate-90 transition-transform duration-300"></i>
-            <span className='text-xs font-medium'>New</span>
+            <span className='text-xs font-medium'>
+              {pathName === '/group' ? 'New Group' : 'New'}
+            </span>
           </button>
         </div>
 
       </div>
 
-      {/* Modal */}
+      {/* Modals */}
       <div className='absolute top-[9999px]'>
         <ModalSearchGroupOrUser
           modalOpen={modalOpen}
           setModalOpen={setModalOpen}
           name={pathName === '/group' ? 'group' : 'user'}
+        />
+        <ModalAddNewGroup
+          modalOpen={createGroupModalOpen}
+          setModalOpen={setCreateGroupModalOpen}
         />
       </div>
 

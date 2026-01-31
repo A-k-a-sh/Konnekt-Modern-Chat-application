@@ -100,7 +100,8 @@ export default function ModalForwardMsg({ forwardMsgModalOpen, setForwardMsgModa
                                     <div className='w-full   flex py-2 flex-row justify-between items-center my-1 rounded-md hover:bg-[#010101c7] duration-200' key={index}>
                                         <div className='flex flex-row gap-2 items-center px-2'>
                                             <img
-                                                src={group.groupImage} alt=""
+                                                src={group.groupImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(group.groupName || 'Group')}&background=random`}
+                                                alt=""
                                                 className='w-12 h-12 rounded-full border'
                                             />
                                             <div>{group.groupName}</div>

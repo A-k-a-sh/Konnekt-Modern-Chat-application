@@ -59,4 +59,39 @@ module.exports = (io, socket, users, groupRooms) => {
             console.error('[Edit Message] Error:', error);
         }
     });
-}
+    // Mark messages as read
+    socket.on('markAsRead', async ({ userId, otherUserId, groupId, chatType }) => {
+        try {
+            const query = { readBy: { $ne: userId } };
+            
+            if (chatType === 'private') {
+                query.$or = [
+                    { senderId: otherUserId, receiverId: userId },
+                    { senderId: userId, receiverId: otherUserId }
+                ];
+            } else if (chatType === 'group') {
+                query.groupId = groupId;
+            }
+
+            const result = await Message.updateMany(
+                query,
+                { $addToSet: { readBy: userId } }
+            );
+
+            console.log(`[Mark As Read] User ${userId} marked ${result.modifiedCount} messages as read`);
+
+            // Emit updated unread count to user
+            const unreadCount = await Message.countDocuments({
+                $or: [
+                    { receiverId: userId, readBy: { $ne: userId } },
+                    { groupId: { $in: await Message.distinct('groupId', { groupId: { $ne: null } }) }, readBy: { $ne: userId } }
+                ]
+            });
+
+            if (users[userId]) {
+                io.to(users[userId]).emit('unreadCountUpdate', { unreadCount });
+            }
+        } catch (error) {
+            console.error('[Mark As Read] Error:', error);
+        }
+    });}

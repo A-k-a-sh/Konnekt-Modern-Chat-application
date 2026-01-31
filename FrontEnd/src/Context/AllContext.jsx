@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { socket } from '../services/socket.service';
-import { useGroupJoinRequests, useUserConnection } from '../hooks';
+import { useGroupJoinRequests, useUserConnection, useUnreadMessages } from '../hooks';
 
 const hydrateGroups = (groups, users) => {
     if (!groups || !users) return [];
@@ -29,6 +29,9 @@ const AllContext = ({ children }) => {
     const [allUserInfo, setAllUserInfo] = useState([])
     const [connected_to, setConnected_to] = useState([])
     const [joined_groupsInfo, setJoined_groupsInfo] = useState([])
+    
+    // Track last activity time for each chat (userId/groupId -> timestamp)
+    const [chatActivity, setChatActivity] = useState({})
 
     React.useEffect(() => {
         const fetchData = async () => {
@@ -97,6 +100,35 @@ const AllContext = ({ children }) => {
 
     // Handle auto-connection when users message each other
     useUserConnection(setConnected_to);
+
+    // Handle unread messages
+    const { unreadCounts, loading: unreadLoading, markAsRead } = useUnreadMessages(userInfo);
+
+    // Update chat activity when new messages arrive
+    useEffect(() => {
+        if (allMessages.length === 0) return;
+        
+        const latestMessage = allMessages[allMessages.length - 1];
+        const timestamp = new Date(latestMessage.time).getTime();
+        
+        if (latestMessage.chatType === 'private') {
+            const otherUserId = latestMessage.sender?.userId === userInfo?.userId 
+                ? latestMessage.receiver?.userId 
+                : latestMessage.sender?.userId;
+            
+            if (otherUserId) {
+                setChatActivity(prev => ({
+                    ...prev,
+                    [`user-${otherUserId}`]: timestamp
+                }));
+            }
+        } else if (latestMessage.chatType === 'group' && latestMessage.groupId) {
+            setChatActivity(prev => ({
+                ...prev,
+                [`group-${latestMessage.groupId}`]: timestamp
+            }));
+        }
+    }, [allMessages, userInfo?.userId]);
 
     // Handle group updates
     useEffect(() => {
@@ -179,7 +211,10 @@ const AllContext = ({ children }) => {
         setConnected_to,
         joined_groupsInfo,
         setJoined_groupsInfo,
-        allUserInfo // Expose fetching user info
+        allUserInfo, // Expose fetching user info
+        chatActivity, // Expose chat activity timestamps
+        unreadCounts, // Expose unread message counts
+        markAsRead // Function to mark messages as read
     }
 
     return (

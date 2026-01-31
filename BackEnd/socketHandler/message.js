@@ -19,7 +19,8 @@ module.exports = (io, socket, users, groupRooms) => {
                 forwardFrom: forwardFrom || null,
                 time: time || new Date(),
                 isDeleted: false,
-                deletedFor: []
+                deletedFor: [],
+                readBy: [sender.userId] // Sender has already "read" their own message
             };
 
             await Message.create(messageData);

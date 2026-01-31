@@ -7,3 +7,4 @@ export { useClickOutside } from './useClickOutside';
 export { useGroupJoinRequests } from './useGroupJoinRequests';
 export { useMessageHistory } from './useMessageHistory';
 export { useUserConnection } from './useUserConnection';
+export { useUnreadMessages } from './useUnreadMessages';

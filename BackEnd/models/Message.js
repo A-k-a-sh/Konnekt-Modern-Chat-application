@@ -67,6 +67,11 @@ const messageSchema = new mongoose.Schema({
         type: Number
     }],
     
+    // Track which users have read this message
+    readBy: [{
+        type: Number
+    }],
+    
     // Metadata
     time: {
         type: Date,

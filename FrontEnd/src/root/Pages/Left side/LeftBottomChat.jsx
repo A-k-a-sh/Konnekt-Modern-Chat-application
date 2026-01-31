@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 
 import { useAllContext } from '../../../Context/AllContext'
 
@@ -13,7 +13,7 @@ const LeftBottomChat = () => {
     const src = 'https://www.shutterstock.com/image-photo/awesome-pic-natureza-600nw-2408133899.jpg'
 
 
-    const { selectedUser, setSelectedUser, setSelectedGroup, connected_to, userInfo } = useAllContext()
+    const { selectedUser, setSelectedUser, setSelectedGroup, connected_to, userInfo, chatActivity, unreadCounts, markAsRead } = useAllContext()
 
     const [isOnline, setIsOnline] = useState(false)
     useIsOnline(selectedUser, userInfo, setIsOnline)
@@ -28,6 +28,19 @@ const LeftBottomChat = () => {
         }
     }, [connected_to])
 
+    // Sort connected users by latest activity
+    const sortedConnectedUsers = useMemo(() => {
+        if (!connected_to || connected_to.length === 0) return [];
+        
+        return [...connected_to]
+            .filter(u => u?.userId)
+            .sort((a, b) => {
+                const aTime = chatActivity[`user-${a.userId}`] || 0;
+                const bTime = chatActivity[`user-${b.userId}`] || 0;
+                return bTime - aTime; // Most recent first
+            });
+    }, [connected_to, chatActivity]);
+
 
     return (
 
@@ -38,9 +51,9 @@ const LeftBottomChat = () => {
                 ) : (
                     <div className='flex-1 overflow-y-auto flex flex-col space-y-1 p-2'>
 
-                        {userInfo && connected_to && connected_to.filter(u => u?.userId).map((user, index) => (
+                        {userInfo && sortedConnectedUsers.map((user, index) => (
                             <div
-                                key={index}
+                                key={user.userId}
                                 className={`
                                     flex-shrink-0 group relative overflow-hidden rounded-xl transition-all duration-300 cursor-pointer
                                     ${selectedUser?.userId === user?.userId
@@ -48,9 +61,13 @@ const LeftBottomChat = () => {
                                         : 'bg-white/5 hover:bg-white/10 hover:shadow-md'
                                     }
                                 `}
+                                style={{
+                                    animation: `slideDown 0.3s ease-out ${index * 0.05}s both`
+                                }}
                                 onClick={() => {
                                     setSelectedUser(user)
                                     setSelectedGroup({})
+                                    markAsRead('private', user.userId, null)
                                 }}
                             >
                                 {/* Hover gradient effect */}
@@ -84,8 +101,12 @@ const LeftBottomChat = () => {
                                         </p>
                                     </div>
 
-                                    {/* Unread badge (optional - can be connected to actual unread count) */}
-                                    {selectedUser?.userId !== user?.userId && (
+                                    {/* Unread badge or chevron */}
+                                    {unreadCounts?.private?.[`user-${user.userId}`] > 0 ? (
+                                        <div className='flex-shrink-0 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5 shadow-lg'>
+                                            {unreadCounts.private[`user-${user.userId}`] > 99 ? '99+' : unreadCounts.private[`user-${user.userId}`]}
+                                        </div>
+                                    ) : selectedUser?.userId !== user?.userId && (
                                         <div className='flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity'>
                                             <i className="fa-solid fa-chevron-right text-xs text-gray-400"></i>
                                         </div>

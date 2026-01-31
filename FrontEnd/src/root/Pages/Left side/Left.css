@@ -32,6 +32,17 @@ div::-webkit-scrollbar-thumb:hover {
     }
 }
 
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
 .Single_User {
     animation: slideIn 0.3s ease-out;
 }

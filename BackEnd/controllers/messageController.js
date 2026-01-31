@@ -165,7 +165,100 @@ const getConversations = async (req, res) => {
     }
 };
 
+// @desc    Get unread message counts per chat
+// @route   GET /api/messages/unread/:userId
+// @access  Private
+const getUnreadCounts = async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        if (!userId) {
+            return res.status(400).json({
+                success: false,
+                message: 'userId is required'
+            });
+        }
+
+        const userIdNum = Number(userId);
+
+        // Get unread counts per private chat
+        const privateUnread = await Message.aggregate([
+            {
+                $match: {
+                    chatType: 'private',
+                    $or: [
+                        { receiverId: userIdNum },
+                        { senderId: userIdNum }
+                    ],
+                    readBy: { $ne: userIdNum },
+                    isDeleted: false
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        $cond: [
+                            { $eq: ['$senderId', userIdNum] },
+                            '$receiverId',
+                            '$senderId'
+                        ]
+                    },
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        // Get unread counts per group
+        const groupUnread = await Message.aggregate([
+            {
+                $match: {
+                    chatType: 'group',
+                    readBy: { $ne: userIdNum },
+                    senderId: { $ne: userIdNum }, // Don't count own messages as unread
+                    isDeleted: false
+                }
+            },
+            {
+                $group: {
+                    _id: '$groupId',
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        // Format results
+        const unreadCounts = {
+            private: {},
+            group: {},
+            total: 0
+        };
+
+        privateUnread.forEach(item => {
+            unreadCounts.private[`user-${item._id}`] = item.count;
+            unreadCounts.total += item.count;
+        });
+
+        groupUnread.forEach(item => {
+            unreadCounts.group[`group-${item._id}`] = item.count;
+            unreadCounts.total += item.count;
+        });
+
+        res.status(200).json({
+            success: true,
+            data: unreadCounts
+        });
+
+    } catch (error) {
+        console.error('[Get Unread Counts] Error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error fetching unread counts'
+        });
+    }
+};
+
 module.exports = {
     getMessages,
-    getConversations
+    getConversations,
+    getUnreadCounts
 };

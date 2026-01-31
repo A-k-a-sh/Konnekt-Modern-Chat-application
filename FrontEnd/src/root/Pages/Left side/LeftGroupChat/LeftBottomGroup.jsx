@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 
 import ModalAddNewGroup from '../../../../Modals/ModalAddNewGroup'
 
@@ -9,9 +9,18 @@ const LeftBottomGroup = () => {
 
   const [modalOpen, setModalOpen] = useState(false);
 
-  const { setSelectedUser, setSelectedGroup, selectedGroup, userInfo, joined_groupsInfo } = useAllContext()
+  const { setSelectedUser, setSelectedGroup, selectedGroup, userInfo, joined_groupsInfo, chatActivity, unreadCounts, markAsRead } = useAllContext()
 
-
+  // Sort groups by latest activity
+  const sortedGroups = useMemo(() => {
+    if (!joined_groupsInfo || joined_groupsInfo.length === 0) return [];
+    
+    return [...joined_groupsInfo].sort((a, b) => {
+      const aTime = chatActivity[`group-${a.groupId}`] || 0;
+      const bTime = chatActivity[`group-${b.groupId}`] || 0;
+      return bTime - aTime; // Most recent first
+    });
+  }, [joined_groupsInfo, chatActivity]);
 
   console.log(joined_groupsInfo);
 
@@ -19,8 +28,8 @@ const LeftBottomGroup = () => {
     <div className='h-full overflow-hidden flex flex-col bg-gradient-to-b from-[#0f0e1a] to-[#1a1a2e] rounded-lg'>
 
       <div className='flex-1 overflow-y-auto flex flex-col space-y-1 p-2'>
-        {joined_groupsInfo.length &&
-          joined_groupsInfo.map((group, index) => {
+        {sortedGroups.length > 0 &&
+          sortedGroups.map((group, index) => {
 
             return (
 
@@ -32,10 +41,14 @@ const LeftBottomGroup = () => {
                     : 'bg-white/5 hover:bg-white/10 hover:shadow-md'
                   }
                 `}
-                key={index}
+                key={group.groupId}
+                style={{
+                  animation: `slideDown 0.3s ease-out ${index * 0.05}s both`
+                }}
                 onClick={() => {
                   setSelectedUser({})
                   setSelectedGroup(group)
+                  markAsRead('group', null, group.groupId)
                 }}
               >
                 {/* Hover gradient effect */}
@@ -67,8 +80,12 @@ const LeftBottomGroup = () => {
                     </p>
                   </div>
 
-                  {/* Arrow indicator */}
-                  {selectedGroup.groupId !== group.groupId && (
+                  {/* Unread badge or arrow */}
+                  {unreadCounts?.group?.[`group-${group.groupId}`] > 0 ? (
+                    <div className='flex-shrink-0 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5 shadow-lg'>
+                      {unreadCounts.group[`group-${group.groupId}`] > 99 ? '99+' : unreadCounts.group[`group-${group.groupId}`]}
+                    </div>
+                  ) : selectedGroup.groupId !== group.groupId && (
                     <div className='flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity'>
                       <i className="fa-solid fa-chevron-right text-xs text-gray-400"></i>
                     </div>
